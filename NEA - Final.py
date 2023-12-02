@@ -16,22 +16,10 @@ window.title("Abdallah and Sons")
 window.configure(bg = "black")
 
 #Function callable to return 2D arrays, populated based on text files
-def loadArray(editType):
-    if editType == "stock":
-        with open("Stock.txt") as stock:
-            lines = [line.split(",") for line in stock]
-    if editType == "shifts":
-        with open("Shift.txt") as shifts:
-            lines = [line.split(",") for line in shifts]
-    if editType == "parcel":
-        with open("Parcels.txt") as parcels:
-            lines = [line.split(",") for line in parcels]
-    if editType == "loyalty":
-        with open("Loyalty.txt") as loyalty:
-            lines = [line.split(",") for line in loyalty]
-    if editType == "previousParcels":
-        with open("PreviousParcels.txt") as previousParcels:
-            lines = [line.split(",") for line in previousParcels]
+def loadArray(arrayName):
+    arrayPath = "dataFiles/" + arrayName + ".txt"
+    with open(arrayPath) as array:
+        lines = [line.split(",") for line in array]
     return lines
 
 #Subroutine callable to save 2D arrays into text files
@@ -214,7 +202,7 @@ def getEditValue(editType,database,frame,mainMenuFrame,status,usernameEntered,le
 
 #Function callable to return an array containing the lengths of each database (in rows). The values are gathered from the ArrayLengths text file 
 def getArrayLength():
-    lengths = open("ArrayLengths.txt")
+    lengths = open("dataFiles/ArrayLengths.txt")
     lines = lengths.readlines()
     return lines
 
@@ -459,7 +447,7 @@ def printClears(xPlace,editType,database,frame1,status,usernameEntered,frame2,fr
 
 #Function callable to return the profit of the store from the Profit text file
 def getProfit():
-    lengths = open("Profit.txt")
+    lengths = open("dataFiles/profit.txt")
     lines = lengths.readlines()
     return lines[0]
 
@@ -787,12 +775,12 @@ def stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemain
     printSells(1265,editType,stockDatabase,mainMenuFrame,status,usernameEntered,subMenuFrame,lengthDatabase,stockScrollbar,0,movementRemaining,float(profit))
     getEditValueCommand = partial(getEditValue,editType,stockDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,stockScrollbar,movementRemaining)
     #Then the back button and stock icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
     backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    stockIcon = PhotoImage(file = "stockIcon.gif")
+    stockIcon = PhotoImage(file = "images/stockIcon.gif")
     stockLabel = Label(subMenuFrame,image = stockIcon, bg = "white", width = 50, height = 60)
     stockLabel.image = stockIcon
     stockLabel.place(x = 1300, y = 0)
@@ -1033,12 +1021,12 @@ def shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemain
     printClears(365,editType,shiftDatabase,mainMenuFrame,status,usernameEntered,None,subMenuFrame,lengthDatabase,shiftScrollbar,1,movementRemaining)
     getEditValueCommand = partial(getEditValue,editType,shiftDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,shiftScrollbar,movementRemaining)
     #Then the back button and shift icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
     backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    shiftIcon = PhotoImage(file = "shiftIcon.gif")
+    shiftIcon = PhotoImage(file = "images/shiftIcon.gif")
     shiftLabel = Label(subMenuFrame,image = shiftIcon, bg = "white", width = 50, height = 60)
     shiftLabel.image = shiftIcon
     shiftLabel.place(x = 1200, y = 0, width = 200)
@@ -1172,12 +1160,12 @@ def billMenu(mainMenuFrame,status,usernameEntered):
     subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
     subMenuFrame.pack()
     #Next the back button and bill icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
     backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    billIcon = PhotoImage(file = "billIcon.gif")
+    billIcon = PhotoImage(file = "images/billIcon.gif")
     #Then labels and entry boxes are placed where the user can input information
     billLabel = Label(subMenuFrame,image = billIcon, bg = "white", width = 60, height = 60)
     billLabel.image = billIcon
@@ -1314,12 +1302,12 @@ def wuMenu(mainMenuFrame,status,usernameEntered):
     subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
     subMenuFrame.pack()
     #Next the back button and Western Union icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
     backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    wuIcon = PhotoImage(file = "wuIcon.gif")
+    wuIcon = PhotoImage(file = "images/wuIcon.gif")
     wuLabel = Label(subMenuFrame,image = wuIcon, bg = "white", width = 60, height = 60)
     wuLabel.image = wuIcon
     wuLabel.place(x = 1300, y = 0)
@@ -1480,12 +1468,12 @@ def loyaltyMenu(subMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase
     printClears(420,editType,loyaltyDatabase,subMenuFrame,status,usernameEntered,mainMenuFrame,loyaltyMenuFrame,lengthDatabase,loyaltyScrollbar,2,movementRemaining)
     getEditValueCommand = partial(getEditValue,editType,loyaltyDatabase,loyaltyMenuFrame,subMenuFrame,status,usernameEntered,lengthDatabase,loyaltyScrollbar,movementRemaining)
     #Then the back button and Loyalty Scheme icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining)
     backButton = Button(loyaltyMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    loyaltyIcon = PhotoImage(file = "loyaltyIcon.gif")
+    loyaltyIcon = PhotoImage(file = "images/loyaltyIcon.gif")
     loyaltyLabel = Label(loyaltyMenuFrame, image = loyaltyIcon, bg = "white", width = 50, height = 60)
     loyaltyLabel.image = loyaltyIcon
     loyaltyLabel.place(x = 1300, y = 0)
@@ -1631,12 +1619,12 @@ def previousParcelsMenu(subMenuFrame,status,usernameEntered,mainMenuFrame,length
     printClears(460,editType,previousParcelsDatabase,subMenuFrame,status,usernameEntered,mainMenuFrame,loyaltyMenuFrame,lengthDatabase,loyaltyScrollbar,4,movementRemaining)
     getEditValueCommand = partial(getEditValue,editType,previousParcelsDatabase,loyaltyMenuFrame,subMenuFrame,status,usernameEntered,lengthDatabase,loyaltyScrollbar,movementRemaining)
     #Then the back button and Parcel icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining)
     backButton = Button(loyaltyMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    parcelIcon = PhotoImage(file = "parcelIcon.gif")
+    parcelIcon = PhotoImage(file = "images/parcelIcon.gif")
     parcelLabel = Label(loyaltyMenuFrame,image = parcelIcon, bg = "white", width = 60, height = 60)
     parcelLabel.image = parcelIcon
     parcelLabel.place(x = 1300, y = 0)
@@ -1736,10 +1724,10 @@ def parcelEditor(editValue,editValue2,editValue3,x,y,editType,parcelDatabase,sub
 #Subroutine callable to load the Parcel Menu
 def parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,printButton):
     page = "sub"
-    editType = "parcel"
+    editType = "parcels"
     #Firstly, the Parcel database and length database are loaded
     lengthDatabase = getArrayLength()
-    parcelDatabase = loadArray(editType)
+    parcelDatabase = loadArray("parcels")
     mainMenuFrame.destroy()
     #Then the frame is created
     subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
@@ -1760,13 +1748,13 @@ def parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemai
     #Next, buttons to clear rows are placed into the frame
     printClears(460,editType,parcelDatabase,mainMenuFrame,status,usernameEntered,None,subMenuFrame,lengthDatabase,parcelScrollbar,1,movementRemaining)
     getEditValueCommand = partial(getEditValue,editType,parcelDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,parcelScrollbar,movementRemaining)
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
     backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
     #Then the back button and Parcel icon are placed
-    parcelIcon = PhotoImage(file = "parcelIcon.gif")
+    parcelIcon = PhotoImage(file = "images/parcelIcon.gif")
     parcelLabel = Label(subMenuFrame,image = parcelIcon, bg = "white", width = 60, height = 60)
     parcelLabel.image = parcelIcon
     parcelLabel.place(x = 1300, y = 0)
@@ -1873,12 +1861,12 @@ def mobileMenu(mainMenuFrame,status,usernameEntered):
     subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
     subMenuFrame.pack()
     #Next the back button and Mobile Top-up icon are placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
     backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
-    mobileIcon = PhotoImage(file = "mobileIcon.gif")
+    mobileIcon = PhotoImage(file = "images/mobileIcon.gif")
     mobileLabel = Label(subMenuFrame,image = mobileIcon, bg = "white", width = 50, height = 60)
     mobileLabel.image = mobileIcon
     mobileLabel.place(x = 1200, y = 0)
@@ -1918,7 +1906,7 @@ def mainMenu(status,usernameEntered,loginFrame):
     mainMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
     mainMenuFrame.pack()
     #Next the back button is placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,mainMenuFrame,status,usernameEntered,None,None,None)
     backButton = Button(mainMenuFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
@@ -1929,32 +1917,32 @@ def mainMenu(status,usernameEntered,loginFrame):
     welcomeLabel = Label(mainMenuFrame, text = ("Welcome",usernameEntered), fg = "white", bg = "black", font = ("Helvetica", 15))
     welcomeLabel.place(x = 580, y = 0)
     #Next, hyperlinks to each system are placed
-    stockIcon = PhotoImage(file = "stockIcon.gif")
+    stockIcon = PhotoImage(file = "images/stockIcon.gif")
     stockMenuCommand = partial(stockMenu,mainMenuFrame,status,usernameEntered,None,None,True,None)
     stockMenuButton = Button(mainMenuFrame, image = stockIcon, bg = "white", command = stockMenuCommand)
     stockMenuButton.image = stockIcon
     stockMenuButton.place(x = 390, y = 300, width = 200)
-    shiftIcon = PhotoImage(file = "shiftIcon.gif")
+    shiftIcon = PhotoImage(file = "images/shiftIcon.gif")
     shiftMenuCommand = partial(shiftMenu,mainMenuFrame,status,usernameEntered,None,None,True)
     shiftMenuButton = Button(mainMenuFrame, image = shiftIcon, bg = "white", command = shiftMenuCommand)
     shiftMenuButton.image = shiftIcon
     shiftMenuButton.place(x = 590, y = 300, width = 200)
-    billIcon = PhotoImage(file = "billIcon.gif")
+    billIcon = PhotoImage(file = "images/billIcon.gif")
     billMenuCommand = partial(billMenu,mainMenuFrame,status,usernameEntered)
     billMenuButton = Button(mainMenuFrame, image = billIcon, bg = "white", command = billMenuCommand)
     billMenuButton.image = billIcon
     billMenuButton.place(x = 790, y = 300, width = 200)
-    wuIcon = PhotoImage(file = "wuIcon.gif")
+    wuIcon = PhotoImage(file = "images/wuIcon.gif")
     wuMenuCommand = partial(wuMenu,mainMenuFrame,status,usernameEntered)
     wuMenuButton = Button(mainMenuFrame, image = wuIcon, bg = "white", command = wuMenuCommand)
     wuMenuButton.image = wuIcon
     wuMenuButton.place(x = 390, y = 371, width = 200)
-    parcelIcon = PhotoImage(file = "parcelIcon.gif")
+    parcelIcon = PhotoImage(file = "images/parcelIcon.gif")
     parcelMenuCommand = partial(parcelMenu,mainMenuFrame,status,usernameEntered,None,None,True)
     parcelMenuButton = Button(mainMenuFrame, image = parcelIcon, bg = "white", command = parcelMenuCommand)
     parcelMenuButton.image = parcelIcon
     parcelMenuButton.place(x = 590, y = 371, width = 200)
-    mobileIcon = PhotoImage(file = "mobileIcon.gif")
+    mobileIcon = PhotoImage(file = "images/mobileIcon.gif")
     mobileMenuCommand = partial(mobileMenu,mainMenuFrame,status,usernameEntered)
     mobileMenuButton = Button(mainMenuFrame, image = mobileIcon, bg = "white", command = mobileMenuCommand)
     mobileMenuButton.image = mobileIcon
@@ -2018,11 +2006,12 @@ def loginMenu():
     enterButton = Button(loginFrame, text = "Enter", font = ("Helvetica",15), fg = "white", bg = "black", command = loginAttemptCommand)
     enterButton.place(x = 650, y = 500)
     #Finally, the back button is placed
-    backIcon = PhotoImage(file = "backIcon.gif")
+    backIcon = PhotoImage(file = "images/backIcon.gif")
     backCommand = partial(back,page,window,None,None,None,None,None)
     backButton = Button(loginFrame,image = backIcon, bg = "white", command = backCommand)
     backButton.image = backIcon
     backButton.place(x = 0, y = 0)
+    window.mainloop()
     
 #The system begins with the running of the Login Menu
 loginMenu()
