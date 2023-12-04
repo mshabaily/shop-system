@@ -1,4 +1,3 @@
-#NEA
 #This system is designed for Abdallah and Sons - a general goods store
 #The Admin username is "NasserAbdallah", and the admin password is "AdminPass123"
 #The default usernames for non admin users are "KamalAbdallah" and "SarahAbdallah" (more are created with the names in the shift Menu), the password for non admins is "UserPass123"
@@ -7,6 +6,7 @@
 from tkinter import *
 from tkinter import messagebox
 from functools import partial
+from os import listdir
 
 #Window is opended and set to fullscreen
 window = Tk()
@@ -15,82 +15,50 @@ window.geometry("1920x1080")
 window.title("Abdallah and Sons")
 window.configure(bg = "black")
 
+global status
+
 #Function callable to return 2D arrays, populated based on text files
 def loadArray(arrayName):
     arrayPath = "dataFiles/" + arrayName + ".txt"
     with open(arrayPath) as array:
         lines = [line.split(",") for line in array]
+    array.close()
     return lines
 
 #Subroutine callable to save 2D arrays into text files
-def saveArray(editType,database,lengthDatabase):
-    if editType == "stock":
-        array = open("Stock.txt", "w")
-        loop2Range = 10
-        edit = 0
-    if editType == "shifts":
-        array = open("Shift.txt", "w")
-        loop2Range = 6
-        edit = 1
-    if editType == "loyalty":
-        array = open("Loyalty.txt", "w")
-        loop2Range = 5
-        edit = 2
-    if editType == "parcel":
-        array = open("Parcels.txt", "w")
-        loop2Range = 4
-        edit = 3
-    if editType == "previousParcels":
-        array = open("PreviousParcels.txt", "w")
-        loop2Range = 4
-        edit = 4
-    for loop in range(int(lengthDatabase[edit])):
-        for loop2 in range(loop2Range):
-            array.write(database[loop][loop2])
+def saveArray(arrayName):
+    arrayPath = "dataFiles/" + arrayName + ".txt"
+    array = open(arrayPath, "w")
+    lines = loadArray(arrayName)
+    for loop in len(lines):
+        for loop2 in range(len(lines[0])):
+            array.write(lines[loop][loop2])
             array.write(",")
         loop2 = 0
         array.write("\n")
+    array.close()
+
+def loadImages():
+    global images
+    images = dict()
+    for loop in range (len(listdir("images"))):
+        images.update({listdir("images")[loop] : PhotoImage(listdir("images")[loop])})
 
 #Subroutine callable to send user to previous screen (should the user be in the "login" screen the window will close)
-def back(page,frame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining):
-    frame.destroy()
-    if page == "main":
+def back(currentPage):
+    print(currentPage)
+    if currentPage == "login":
+        window.destroy()
+    if currentPage == "main":
         loginMenu()
-    if page == "sub":
-        mainMenu(status,usernameEntered,None)
-    if page == "loyalty":
-        parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,True)
+    if currentPage == "sub":
+        mainMenu()
+    if currentPage == "loyalty":
+        parcelMenu()
 
 #Subroutine callable to display errors
 def error(errorMessage):
     messagebox.showerror(title = "Error", message = errorMessage)
-
-#Subroutine callable to save values entered while editing databases into variables
-def saveEditValue(entryValue,entryValue2,entryValue3,entryValue4,x,y,editType,window2,database,frame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining):
-    editValue = entryValue.get()
-    if entryValue2 != None :
-        editValue2 = entryValue2.get()
-    else:
-        editValue2 = None
-    if entryValue3 != None :
-        editValue3 = entryValue3.get()
-    else:
-        editValue3 = None
-    if entryValue4 != None :
-        editValue4 = entryValue4.get()
-    else:
-        editValue4 = None
-    window2.destroy()
-    if editType == "stock":
-        stockEditor(editValue,editValue2,x,y,editType,database,frame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining)
-    elif editType == "shifts":
-        shiftEditor(editValue,editValue2,editValue3,editValue4,x,y,editType,database,frame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining)
-    elif editType == "loyalty":
-        loyaltyEditor(editValue,editValue2,editValue3,x,y,editType,database,frame,status,usernameEntered,mainMenuFrame,lengthDatabase,scrollbar,movementRemaining)
-    elif editType == "parcel":
-        parcelEditor(editValue,editValue2,editValue3,x,y,editType,database,frame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining)
-    elif editType == "previousParcels":
-        previousParcelsEditor(editValue,editValue2,editValue3,x,y,editType,database,frame,status,usernameEntered,mainMenuFrame,lengthDatabase,scrollbar,movementRemaining)
 
 #Subroutine callable to open the database editing window
 def getEditValue(editType,database,frame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining):
@@ -200,105 +168,67 @@ def getEditValue(editType,database,frame,mainMenuFrame,status,usernameEntered,le
         editButton = Button(window2, text = "Confirm", font = ("Helvetica", 10), command = saveEditValueCommand)
         stockCanvas.create_window(350, 25, window=editButton)
 
-#Function callable to return an array containing the lengths of each database (in rows). The values are gathered from the ArrayLengths text file 
-def getArrayLength():
-    lengths = open("dataFiles/ArrayLengths.txt")
-    lines = lengths.readlines()
-    return lines
-
-#Subroutine callable to save the lengths of databases into the ArrayLengths text file
-def saveArrayLength(x,lengthDatabase):
-    array = open("arrayLengths.txt", "w")
-    for loop in range(5):
-        array.write(lengthDatabase[loop])
+def goToScreen(destination):
+    if destination == "login":
+        loginMenu()
+    if destination == "main":
+        mainMenu()
+    if destination == "stock":
+        stockMenu()
+    if destination == "shifts":
+        shiftMenu()
+    if destination == "loyalty":
+        loyaltyMenu()
+    if destination == "parcel":
+        parcelMenu()
+    if destination == "previousParcels":
+        previousParcelsMenu()
 
 #Subroutine callable to remove the final row from a database
-def popDatabase(editType,mainMenuFrame,status,usernameEntered,lengthDatabase,database,frame,x,movementRemaining,loyaltyFrame):
+def popDatabase(currentScreen,status,database,frame):
     #First it determines if the user is able to remove the row from a database (launching an error if they are not)
-    append = True
-    if editType == "shifts" and status == "user":
+    if currentScreen == "shifts" and status == "user":
         error("Admin only")
-        append = False
-    if editType == "shifts" and int(lengthDatabase[1]) == 1:
+        return
+    if currentScreen == "shifts" and len(database) == 1:
         error("Cannot remove admin")
-        append = False
-    if append == True:
-        frame.destroy()
-        try:
-            #The row is removed
-            database.pop()
-            #The database will then be saved, and the length of the database will be updated
-            lengthDatabase[x] = str(int(lengthDatabase[x]) - 1) + "\n"
-            saveArrayLength(x,lengthDatabase)
-            saveArray(editType,database,lengthDatabase)
-        except:
-            error("Array empty")
-        if editType == "stock":
-            stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,True,None)
-        if editType == "shifts":
-            shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,True)
-        if editType == "loyalty":
-            loyaltyMenu(mainMenuFrame,status,usernameEntered,loyaltyFrame,lengthDatabase,movementRemaining,True)
-        if editType == "parcel":
-            parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,True)
-        if editType == "previousParcels":
-            previousParcelsMenu(mainMenuFrame,status,usernameEntered,loyaltyFrame,lengthDatabase,movementRemaining,True)
+        return
+    frame.destroy()
+    try:
+        #The row is removed
+        database.pop()
+        #The database will then be saved
+        saveArray(currentScreen)
+    except:
+        error("Array empty")
+    goToScreen(currentScreen)
 
 #Subroutine callable add a new row to a database
-def appendDatabase(editType,mainMenuFrame,status,usernameEntered,lengthDatabase,database,frame,x,columns,movementRemaining,loyaltyFrame):
+def appendDatabase(currentScreen,status,database,frame):
     #First it determines if the user is able to add a row to the database (launching an error if they are not)
-    append = True
-    if editType == "shifts" and status == "user":
+    if currentScreen == "shifts" and status == "user":
         error("Admin only")
-        append = False
-    if editType == "shifts" and lengthDatabase[1] == "1":
-        error("Cannot remove admin")
-        append == False
-    if append == True:
-        #Should the user be able then the row will be added
-        newLine = (["   "] * columns)
-        frame.destroy()
-        if editType == "stock":
-            lengthDatabase[x] = str(int(lengthDatabase[x]) + 1) + "\n"
-            saveArrayLength(x,lengthDatabase)
-            newLineAdd = "0"
-            #Some items in new rows will be populated with "   ", while certain others will be given more appropriate values
-            newLine[9] = newLineAdd
-            newLineAdd2 = "0"
-            newLine[8] = newLineAdd2
-            database.append(newLine)
-            #The database will then be saved, and the length of the database will be updated
-            saveArray(editType,database,lengthDatabase)
-            stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,True,None)
-        elif editType == "shifts" and status == "admin":
-            lengthDatabase[x] = str(int(lengthDatabase[x]) + 1) + "\n"
-            saveArrayLength(x,lengthDatabase)
-            newLineAdd2 = "0 Hours"
-            newLineAdd = str(int(lengthDatabase[x]))
-            newLineAdd = ("0" * (3-(len(newLineAdd)))) + newLineAdd
-            newLine[0] = newLineAdd
-            newLine[4] = newLineAdd2
-            database.append(newLine)
-            saveArray(editType,database,lengthDatabase)
-            shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,True)
-        elif editType == "shifts" and status == "user":
+        return
+    #Should the user be able then the row will be added
+    newLine = (["   "] * len(database[0]))
+    frame.destroy()
+    #Some items in new rows will be populated with "   ", while certain others will be given more appropriate values
+    if currentScreen == "stock":
+        newLine[8] = "0"
+        newLine[9] = "0"
+    elif currentScreen == "shifts":
+        if status != "admin":
             error("Admin only")
-        elif editType == "loyalty":
-            lengthDatabase[x] = str(int(lengthDatabase[x]) + 1) + "\n"
-            saveArrayLength(x,lengthDatabase)
-            newLineAdd = str(int(lengthDatabase[x]))
-            newLineAdd = ("0" * (3-(len(newLineAdd)))) + newLineAdd
-            newLineAdd2 = "0"
-            newLine[4] = newLineAdd2
-            newLine[0] = newLineAdd
-            database.append(newLine)
-            saveArray(editType,database,lengthDatabase)
-            loyaltyMenu(mainMenuFrame,status,usernameEntered,loyaltyFrame,lengthDatabase,movementRemaining,True)
-        elif editType == "previousParcels":
-            lengthDatabase[x] = str(int(lengthDatabase[x]) + 1) + "\n"
-            saveArrayLength(x,lengthDatabase)
-            database.append(newLine)
-            saveArray(editType,database,lengthDatabase)
+            return
+        newLine[0] = "test"
+        newLine[4] = "test"
+    elif currentScreen == "loyalty":
+        newLine[0] = "test"
+        newLine[4] = "test"
+    database.append(newLine)
+    #The database will then be saved, and the length of the database will be updated
+    saveArray(currentScreen)
+    goToScreen(currentScreen)
 
 #Function callable to determine and return the row selected by the user, ignoring appended rows (which are adjusted for elsewhere)
 #Rows are dermined by comparing the cursor's y co-ordinate to the y co-ordinates of rows, each row checked using a recursive loop
@@ -433,17 +363,14 @@ def clearRow(editType,database,frame1,status,usernameEntered,frame2,frame3,lengt
         frame3.destroy()
         appendDatabase("previousParcels",frame1,status,usernameEntered,lengthDatabase,database,frame3,4,4,movementRemaining,frame2)
         database.remove(database[row])
-        lengthDatabase[4] = str(int(lengthDatabase[4])-1)
-        saveArrayLength(4, lengthDatabase)
         saveArray(editType,database,lengthDatabase)
         previousParcelsMenu(frame1,status,usernameEntered,frame2,lengthDatabase,movementRemaining,False)
 
 #Subroutine callable to place buttons used in the clearing of rows onto screens
-def printClears(xPlace,editType,database,frame1,status,usernameEntered,frame2,frame3,lengthDatabase,scrollbar,x,movementRemaining):
-    clearRowCommand = partial(clearRow,editType,database,frame1,status,usernameEntered,frame2,frame3,lengthDatabase,scrollbar,x,movementRemaining)
+def printClears(startingXPos, frame):
     for loop in range(16):
-        xButton = Button(frame3,text = "X", font = ("Helvetica"), fg = "black",  width = 1, height = 1, command = clearRowCommand)
-        xButton.place(x = xPlace, y = (152+(30*loop)))
+        xButton = Button(frame,text = "X", font = ("Helvetica"), fg = "black",  width = 1, height = 1, command = clearRow)
+        xButton.place(x = startingXPos, y = (152+(30*loop)))
 
 #Function callable to return the profit of the store from the Profit text file
 def getProfit():
@@ -683,29 +610,9 @@ def stockEditor(editValue,editValue2,x,y,editType,stockDatabase,subMenuFrame,mai
     stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False,None)
 
 #Subroutine callable to sort values based on quantity in the Stock Database
-def sort(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,printButton,highlightList,database,subMenuFrame):
-    sortArray = []
-    #Firstly the quantites are placed into a list
-    for appendLoop in range(int(lengthDatabase[0])):
-        sortArray.append(database[appendLoop][9])
-    completePass = False
-    while completePass == False:
-        completePass = True
-        #Next a bubble sort is used to arrange quantities into descending order
-        for sortLoop in range((len(sortArray)-1)):
-            if int(sortArray[sortLoop]) < int(sortArray[sortLoop+1]):
-                swapValue = sortArray[sortLoop+1]
-                sortArray[sortLoop+1] = sortArray[sortLoop]
-                sortArray[sortLoop] = swapValue
-                completePass = False
-    #Finally the database is rearranged and saved
-    sortDatabase = []
-    for linkLoop in range(len(sortArray)):
-        for linkLoop2 in range(len(sortArray)):
-            if int(sortArray[linkLoop]) == int(database[linkLoop2][9]):
-                sortDatabase.append(database[linkLoop2])
-    saveArray("stock",sortDatabase,lengthDatabase)
-    subMenuFrame.destroy()
+def sort(data):
+    data.sort()
+    saveArray(data)
     stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,printButton,highlightList)
     
 #Subroutine callable to search for values in the Stock Database
@@ -727,60 +634,33 @@ def search(searchbar,database,mainMenuFrame,status,usernameEntered,lengthDatabas
     stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False,highlightList)
 
 #Subroutine callable to determine the positioning of the scrollbar
-def getScrollbarValues(scrollbar,mainMenuFrame,status,usernameEntered,lengthDatabase,getScrollbarValuesButton,currentFrame,editType,loyaltyFrame):
+def getScrollbarValues(scrollbar,currentScreen):
     bottom = (scrollbar.get()[1]*100)
     top = (scrollbar.get()[0]*100)
     movementRemaining = 100 - bottom
-    currentFrame.destroy()
-    if editType == "stock":
-        stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False,None)
-    elif editType == "shifts":
-        shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False)
-    elif editType == "loyalty":
-        loyaltyMenu(mainMenuFrame,status,usernameEntered,loyaltyFrame,lengthDatabase,movementRemaining,False)
-    elif editType == "parcel":
-        parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False)
-    elif editType == "previousParcels":
-        previousParcelsMenu(mainMenuFrame,status,usernameEntered,loyaltyFrame,lengthDatabase,movementRemaining,False)
+    goToScreen(currentScreen)
 
 #Subroutine callable to load the Stock Menu
-def stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,printButton,highlightList):
+def stockMenu():
     #Firstly the profit value, stock database and length database are loaded
     profit = getProfit()
     loop2 = 0
-    lengthDatabase = getArrayLength()
-    editType = "stock"
-    page = "sub"
-    mainMenuFrame.destroy()
-    stockDatabase = loadArray(editType)
+    stockDatabase = loadArray("stock")
     #Then the frame is created
     subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
     subMenuFrame.pack()
     #Next a canvas is created with an assigned scrollbar
-    stockCanvas = Canvas(subMenuFrame, bg = "white", width = 1148, height = 460, scrollregion=(0,0,0,((int(lengthDatabase[0])*30)-20)), yscrollincrement = 30)
+    stockCanvas = Canvas(subMenuFrame, bg = "white", width = 1148, height = 460, scrollregion=(0,0,0,((16*30)-20)), yscrollincrement = 30)
     stockCanvas.place(x = 80, y = 168)
     stockScrollbar = Scrollbar(subMenuFrame, orient = "vertical", command = stockCanvas.yview)
     stockScrollbar.place(x = 42, y = 152, height = 482)
     stockCanvas.config(yscrollcommand=stockScrollbar.set)
     #Then a temporary button is optionally created (this button will immediatly be pressed automatically in order to determine the initial position of the scrollbar)
-    if printButton == True:
-        movementRemaining = 0
-        getScrollbarValuesButton = Button(subMenuFrame,width = 1, height = 32)
-        getScrollbarValuesCommand = partial(getScrollbarValues,stockScrollbar,mainMenuFrame,status,usernameEntered,lengthDatabase,getScrollbarValuesButton,subMenuFrame,editType,None)
-        getScrollbarValuesButton.config(command = getScrollbarValuesCommand)
-        getScrollbarValuesButton.place(x = 162, y = 152)
     #Next, buttons to clear rows, buy items and sell items are placed into the frame
-    printClears(60,editType,stockDatabase,mainMenuFrame,status,usernameEntered,None,subMenuFrame,lengthDatabase,stockScrollbar,0,movementRemaining)
-    printBuys(1230,editType,stockDatabase,mainMenuFrame,status,usernameEntered,subMenuFrame,lengthDatabase,stockScrollbar,0,movementRemaining,float(profit))
-    printSells(1265,editType,stockDatabase,mainMenuFrame,status,usernameEntered,subMenuFrame,lengthDatabase,stockScrollbar,0,movementRemaining,float(profit))
-    getEditValueCommand = partial(getEditValue,editType,stockDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,stockScrollbar,movementRemaining)
+    #printClears(60)
+    #printSells(1265)
     #Then the back button and stock icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
-    backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
-    stockIcon = PhotoImage(file = "images/stockIcon.gif")
+    stockIcon = PhotoImage(file = "images/stock.gif")
     stockLabel = Label(subMenuFrame,image = stockIcon, bg = "white", width = 50, height = 60)
     stockLabel.image = stockIcon
     stockLabel.place(x = 1300, y = 0)
@@ -790,55 +670,52 @@ def stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemain
     displayProfit = "£" + profit
     profitAmountLabel = Label(subMenuFrame,text = displayProfit, fg = "black", bg = "white", font = ("Helvetica",15))
     profitAmountLabel.place(x = 215, y = 634)
-    clearProfitCommand = partial(clearProfit,mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,subMenuFrame)
-    clearProfitButton = Button(subMenuFrame,text = "Reset", fg = "black", bg = "white", font = ("Helvetica",8),command = clearProfitCommand)
-    clearProfitButton.place(x = 42, y = 634, width = 38, height = 30)
+    #clearProfitButton = Button(subMenuFrame,text = "Reset", fg = "black", bg = "white", font = ("Helvetica",8),command = clearProfit())
+    #clearProfitButton.place(x = 42, y = 634, width = 38, height = 30)
     #A searchbar is placed to allow users to locate values
     stockSearchbar = Entry(subMenuFrame, fg = "black", bg = "white", font = ("Helvetica",15), width = 84)
     stockSearchbar.place(x = 304, y = 636)
-    searchCommand = partial(search,stockSearchbar,stockDatabase,mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,subMenuFrame)
+    searchCommand = partial(search,stockSearchbar,stockDatabase)
     stockSearchButton = Button(subMenuFrame, text = "Search", fg = "black", bg = "white", font = ("Helvetica",13), command = searchCommand)
     stockSearchButton.place(x = 1233, y = 634, height = 30, width = 70)
-    #Then a button is placed to sort the database based on quantity
-    sortCommand = partial(sort,mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False,None,stockDatabase,subMenuFrame)
-    sortButton = Button(subMenuFrame, fg = "black", bg = "white", font = ("Helvetica",10), text = "Sort", command = sortCommand)
+    #Then a button is placed to sort the database based on quantity)
+    sortButton = Button(subMenuFrame, fg = "black", bg = "white", font = ("Helvetica",10), text = "Sort", command = sort())
     sortButton.place(x = 1233, y = 130, height = 25, width = 70)
     #Next, buttons used to add and remove rows from the database are added
-    appendDatabaseCommand = partial(appendDatabase,editType,mainMenuFrame,status,usernameEntered,lengthDatabase,stockDatabase,subMenuFrame,0,10,movementRemaining,None)
-    plusButton = Button(subMenuFrame,text = "+", bg = "white", command = appendDatabaseCommand, height = 1)
+    plusButton = Button(subMenuFrame,text = "+", bg = "white", command = appendDatabase(), height = 1)
     plusButton.place(x = 60, y = 126)
-    popDatabaseCommand = partial(popDatabase,editType,mainMenuFrame,status,usernameEntered,lengthDatabase,stockDatabase,subMenuFrame,0,movementRemaining,None)
-    minusButton = Button(subMenuFrame,text = "-", bg = "white", command = popDatabaseCommand, height = 1)
+    minusButton = Button(subMenuFrame,text = "-", bg = "white", command = popDatabase(), height = 1)
     minusButton.place(x = 43, y = 126)
     errorCommand = partial(error, "Edit quantity by buying/selling items")
     #Iteration is then used to place buttons on the canvas displaying each item in the stock database (on press allowing for the editing of the item should the user be permitted)
     a = 61
     b = 0
-    for loop in range(int(lengthDatabase[0])):
+    for loop in range(16):
         loop2 = 0
         for loop2 in range(10):
             background = "white"
             #If the Reorder point is higher than the Amount, the label's background will be red
             if int(stockDatabase[loop][9]) < int(stockDatabase[loop][8]):
-                background = "red"
+               background = "red"
             #If the value is being searched for, the label's background will be yellow
+            highlightList = "test"
             if highlightList != None:
                 for highlightLoop in range(len(highlightList)):
                     if loop == int(highlightList[highlightLoop]) and loop2 == 1:
                         background = "yellow"
             if loop2 == 0:
-                stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background,  width = 13, height = 1, command = getEditValueCommand)
+                stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background,  width = 13, height = 1, command = getEditValue())
                 stockCanvas.create_window(a, b, window=stockArrayLabel)
                 a = a + 77
             elif loop2 == 1:
-                stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background, width = 24, height = 1, command = getEditValueCommand)
+                stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background, width = 24, height = 1, command = getEditValue())
                 stockCanvas.create_window(a, b, window=stockArrayLabel)
                 a = a + 63
             elif loop2 == 9:
                 stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background, width = 10, height = 1, command = errorCommand)
                 stockCanvas.create_window(a, b, window=stockArrayLabel)
             else:
-                stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background, width = 10, height = 1, command = getEditValueCommand)
+                stockArrayLabel = Button(text = stockDatabase[loop][loop2], font = ("Helvetica"), bg = background, width = 10, height = 1, command = getEditValue())
                 stockCanvas.create_window(a, b, window=stockArrayLabel)
             a = a + 100
         a = 61
@@ -860,8 +737,6 @@ def stockMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemain
             stockArrayHeadingLabel = Label(subMenuFrame,text = stockArrayHeading[loop3], font = ("Helvetica"), width = 12, height = 1)
             stockArrayHeadingLabel.place(x = a, y = b)
             a = a + 100
-    if printButton == True:
-        getScrollbarValuesButton.invoke()
 
 #Subroutine callable to edit items selected in the Shift Database
 def shiftEditor(editValue,editValue2,editValue3,editValue4,x,y,editType,shiftDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining):
@@ -947,7 +822,6 @@ def pay(entryValue,window2,mainMenuFrame,status,usernameEntered,lengthDatabase,m
     if len(str(int(days))) > 2:
         #Next, the Shift Database, Length Database and profit are loaded
         shiftDatabase = loadArray("shifts")
-        lengthDatabase = getArrayLength()
         profit = float(getProfit())
         for loop in range(int(lengthDatabase[1])):
             #Then the payment is determined based on the wage, absense and shift
@@ -991,56 +865,36 @@ def payEntry(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaini
         
 
 #Subroutine callable to load the Shift Menu
-def shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,printButton):
-    editType = "shifts"
-    page = "sub"
+def shiftMenu():
     #Firstly, the shift database and length database are loaded
-    lengthDatabase = getArrayLength()
-    shiftDatabase = loadArray(editType)
-    mainMenuFrame.destroy()
+    shiftDatabase = loadArray("shifts")
     #Then the frame is created
-    subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    subMenuFrame.pack()
+    subMenuFrame = createDefaultFrame
     #Next a canvas is created with an assigned scrollbar
-    shiftCanvas = Canvas(subMenuFrame, bg = "white", width = 725, height = 460, scrollregion=(0,0,0,((int(lengthDatabase[1])*30)-20)), yscrollincrement = 30)
+    shiftCanvas = Canvas(subMenuFrame, bg = "white", width = 725, height = 460, scrollregion=(0,0,0,((16*30)-20)), yscrollincrement = 30)
     shiftCanvas.place(x = 385, y = 168)
     shiftScrollbar = Scrollbar(subMenuFrame, orient = "vertical", command = shiftCanvas.yview)
     shiftScrollbar.place(x = 347, y = 152, height = 482)
     shiftCanvas.config(yscrollcommand=shiftScrollbar.set)
     #Then a temporary button is optionally created (this button will immediatly be pressed automatically in order to determine the initial position of the scrollbar)
-    if printButton == True:
-        movementRemaining = 0
-        getScrollbarValuesButton = Button(subMenuFrame,width = 1, height = 32)
-        getScrollbarValuesCommand = partial(getScrollbarValues,shiftScrollbar,mainMenuFrame,status,usernameEntered,lengthDatabase,getScrollbarValuesButton,subMenuFrame,editType,None)
-        getScrollbarValuesButton.config(command = getScrollbarValuesCommand)
-        getScrollbarValuesButton.place(x = 162, y = 152)
     #Next, buttons to clear rows and pay employees are placed into the frame
     payEntryCommand = partial(payEntry,mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,subMenuFrame)
     payButton = Button(subMenuFrame,text = "Pay Employees", bg = "white", command = payEntryCommand)
     payButton.place(x = 346, y = 633)
-    printClears(365,editType,shiftDatabase,mainMenuFrame,status,usernameEntered,None,subMenuFrame,lengthDatabase,shiftScrollbar,1,movementRemaining)
-    getEditValueCommand = partial(getEditValue,editType,shiftDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,shiftScrollbar,movementRemaining)
-    #Then the back button and shift icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
-    backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
+    printClears(365)
     shiftIcon = PhotoImage(file = "images/shiftIcon.gif")
     shiftLabel = Label(subMenuFrame,image = shiftIcon, bg = "white", width = 50, height = 60)
     shiftLabel.image = shiftIcon
     shiftLabel.place(x = 1200, y = 0, width = 200)
     #Next, buttons used to add and remove rows from the database are added
-    appendDatabaseCommand = partial(appendDatabase,editType,mainMenuFrame,status,usernameEntered,lengthDatabase,shiftDatabase,subMenuFrame,1,6,movementRemaining,None)
-    plusButton = Button(subMenuFrame,text = "+", bg = "white", command = appendDatabaseCommand, height = 1)
+    plusButton = Button(subMenuFrame,text = "+", bg = "white", command = appendDatabase(), height = 1)
     plusButton.place(x = 365, y = 126)
-    popDatabaseCommand = partial(popDatabase,editType,mainMenuFrame,status,usernameEntered,lengthDatabase,shiftDatabase,subMenuFrame,1,movementRemaining,None)
-    minusButton = Button(subMenuFrame,text = "-", bg = "white", command = popDatabaseCommand, height = 1)
+    minusButton = Button(subMenuFrame,text = "-", bg = "white", command = popDatabase(), height = 1)
     minusButton.place(x = 348, y = 126)
     a = 48
     b = 0
     #Iteration is then used to place buttons on the canvas displaying each item in the stock database (on press allowing for the editing of the item should the user be permitted)
-    for loop in range(int(lengthDatabase[1])):
+    for loop in range(16):
         loop2 = 0
         for loop2 in range(6):
             #Should "Absense" be higher than 3 hours, the background of that row will become red
@@ -1048,19 +902,19 @@ def shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemain
             if int(str(shiftDatabase[loop][4])[0]) > 3:
                 background = "red"
             if loop2 == 0:
-                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, bg = background, command = getEditValueCommand)
+                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, bg = background, command = getEditValue())
                 shiftCanvas.create_window(a, b, window=shiftArrayLabel)
                 a = a + 63
             elif loop2 == 1:
-                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 24, height = 1, bg = background, command = getEditValueCommand)
+                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 24, height = 1, bg = background, command = getEditValue())
                 shiftCanvas.create_window(a, b, window=shiftArrayLabel)
                 a = a + 67
             elif loop2 == 2:
-                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 11, height = 1, bg = background, command = getEditValueCommand)
+                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 11, height = 1, bg = background, command = getEditValue())
                 shiftCanvas.create_window(a, b, window=shiftArrayLabel)
                 a = a + 5
             else:
-                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, bg = background, command = getEditValueCommand)
+                shiftArrayLabel = Button(text = shiftDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, bg = background, command = getEditValue())
                 shiftCanvas.create_window(a, b, window=shiftArrayLabel)
             a = a + 99
         a = 48
@@ -1082,8 +936,6 @@ def shiftMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemain
             shiftArrayHeadingLabel = Label(subMenuFrame,text = shiftArrayHeading[loop3], font = ("Helvetica"), width = 11, height = 1, bg = "white")
             shiftArrayHeadingLabel.place(x = a, y = b)
             a = a + 100
-    if printButton == True:
-        getScrollbarValuesButton.invoke()
 
 #Subroutine callable to display confirmation of sucessful bill verification and adjust profit
 def confirmBill(window3,membership):
@@ -1154,19 +1006,11 @@ def billEnter(subMenuFrame,billCardIDEntry,paymentEntry,billType,membership):
 
 #Subroutine callable to load the Bill Menu
 def billMenu(mainMenuFrame,status,usernameEntered):
-    page = "sub"
-    mainMenuFrame.destroy()
     #Firstly, the frame is created
-    subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    subMenuFrame.pack()
+    subMenuFrame = createDefaultFrame("sub")
     #Next the back button and bill icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
-    backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
-    billIcon = PhotoImage(file = "images/billIcon.gif")
     #Then labels and entry boxes are placed where the user can input information
+    billIcon = images['bill']
     billLabel = Label(subMenuFrame,image = billIcon, bg = "white", width = 60, height = 60)
     billLabel.image = billIcon
     billLabel.place(x = 1300, y = 0)
@@ -1296,17 +1140,8 @@ def wuEnter(subMenuFrame,senderNameEntry,recipientNameEntry,senderEmailEntry,sen
 
 #Subroutine callable to load the Western Union Menu
 def wuMenu(mainMenuFrame,status,usernameEntered):
-    page = "sub"
-    mainMenuFrame.destroy()
     #Firstly, the frame is created
-    subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    subMenuFrame.pack()
-    #Next the back button and Western Union icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
-    backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
+    subMenuFrame = createDefaultFrame("sub")
     wuIcon = PhotoImage(file = "images/wuIcon.gif")
     wuLabel = Label(subMenuFrame,image = wuIcon, bg = "white", width = 60, height = 60)
     wuLabel.image = wuIcon
@@ -1441,66 +1276,47 @@ def loyaltyEditor(editValue,editValue2,editValue3,x,y,editType,loyaltyDatabase,l
     loyaltyMenu(loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining,False)
 
 #Subroutine callable to load the Loyalty Scheme Menu
-def loyaltyMenu(subMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining,printButton):
-    page = "loyalty"
-    editType = "loyalty"
+def loyaltyMenu():
     #Firstly, the loyalty database and length database are loaded
-    lengthDatabase = getArrayLength()
-    loyaltyDatabase = loadArray(editType)
-    subMenuFrame.destroy()
+    loyaltyDatabase = loadArray("loyalty")
     #Then the frame is created
-    loyaltyMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    loyaltyMenuFrame.pack()
+    loyaltyMenuFrame = createDefaultFrame("loyalty")
     #Next a canvas is created with an assigned scrollbar
-    loyaltyCanvas = Canvas(loyaltyMenuFrame, bg = "white", width = 675, height = 460, scrollregion=(0,0,0,((int(lengthDatabase[2])*30)-20)), yscrollincrement = 30)
+    loyaltyCanvas = Canvas(loyaltyMenuFrame, bg = "white", width = 675, height = 460, scrollregion=(0,0,0,((6*30)-20)), yscrollincrement = 30)
     loyaltyCanvas.place(x = 440, y = 166)
     loyaltyScrollbar = Scrollbar(loyaltyMenuFrame, orient = "vertical", command = loyaltyCanvas.yview)
     loyaltyScrollbar.place(x = 402, y = 152, height = 482)
     loyaltyCanvas.config(yscrollcommand=loyaltyScrollbar.set)
-    #Then a temporary button is optionally created (this button will immediatly be pressed automatically in order to determine the initial position of the scrollbar)
-    if printButton == True:
-        movementRemaining = 0
-        getScrollbarValuesButton = Button(loyaltyMenuFrame,width = 1, height = 32)
-        getScrollbarValuesCommand = partial(getScrollbarValues,loyaltyScrollbar,subMenuFrame,status,usernameEntered,lengthDatabase,getScrollbarValuesButton,loyaltyMenuFrame,editType,mainMenuFrame)
-        getScrollbarValuesButton.config(command = getScrollbarValuesCommand)
-        getScrollbarValuesButton.place(x = 162, y = 152)
     #Next, buttons to clear rows are placed into the frame
-    printClears(420,editType,loyaltyDatabase,subMenuFrame,status,usernameEntered,mainMenuFrame,loyaltyMenuFrame,lengthDatabase,loyaltyScrollbar,2,movementRemaining)
-    getEditValueCommand = partial(getEditValue,editType,loyaltyDatabase,loyaltyMenuFrame,subMenuFrame,status,usernameEntered,lengthDatabase,loyaltyScrollbar,movementRemaining)
+    printClears(420,"loyalty")
     #Then the back button and Loyalty Scheme icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining)
-    backButton = Button(loyaltyMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
     loyaltyIcon = PhotoImage(file = "images/loyaltyIcon.gif")
     loyaltyLabel = Label(loyaltyMenuFrame, image = loyaltyIcon, bg = "white", width = 50, height = 60)
     loyaltyLabel.image = loyaltyIcon
     loyaltyLabel.place(x = 1300, y = 0)
     #Next, buttons used to add and remove rows from the database are added
-    appendDatabaseCommand = partial(appendDatabase,editType,subMenuFrame,status,usernameEntered,lengthDatabase,loyaltyDatabase,loyaltyMenuFrame,2,5,movementRemaining,mainMenuFrame)
-    plusButton = Button(loyaltyMenuFrame,text = "+", bg = "white", command = appendDatabaseCommand, height = 1)
+
+    plusButton = Button(loyaltyMenuFrame,text = "+", bg = "white", command = appendDatabase(), height = 1)
     plusButton.place(x = 420, y = 126)
-    popDatabaseCommand = partial(popDatabase,editType,subMenuFrame,status,usernameEntered,lengthDatabase,loyaltyDatabase,loyaltyMenuFrame,2,movementRemaining,mainMenuFrame)
-    minusButton = Button(loyaltyMenuFrame,text = "-", bg = "white", command = popDatabaseCommand, height = 1)
+    minusButton = Button(loyaltyMenuFrame,text = "-", bg = "white", command = popDatabase(), height = 1)
     minusButton.place(x = 403, y = 126)
     a = 48
     b = 0
     #Iteration is then used to place buttons on the canvas displaying each item in the stock database (on press allowing for the editing of the item should the user be permitted)
-    for loop in range(int(lengthDatabase[2])):
+    for loop in range(4):
         loop2 = 0
         for loop2 in range(5):
             if loop2 == 0:
-                loyaltyArrayLabel = Button(loyaltyMenuFrame, text = loyaltyDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, command = getEditValueCommand)
+                loyaltyArrayLabel = Button(loyaltyMenuFrame, text = loyaltyDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, command = getEditValue())
                 loyaltyCanvas.create_window(a, b, window=loyaltyArrayLabel)
                 a = a + 90
             if loop2 == 1:
-                loyaltyArrayLabel = Button(loyaltyMenuFrame, text = loyaltyDatabase[loop][loop2], font = ("Helvetica"), width = 30, height = 1, command = getEditValueCommand)
+                loyaltyArrayLabel = Button(loyaltyMenuFrame, text = loyaltyDatabase[loop][loop2], font = ("Helvetica"), width = 30, height = 1, command = getEditValue())
                 loyaltyCanvas.create_window(a, b, window=loyaltyArrayLabel)
                 a = a + 90
             else:
                 a = a + 100
-                loyaltyArrayLabel = Button(loyaltyMenuFrame, text = loyaltyDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, command = getEditValueCommand)
+                loyaltyArrayLabel = Button(loyaltyMenuFrame, text = loyaltyDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, command = getEditValue())
                 loyaltyCanvas.create_window(a, b, window=loyaltyArrayLabel)
         a = 48
         b = b + 30
@@ -1517,8 +1333,6 @@ def loyaltyMenu(subMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase
             loyaltyArrayHeadingLabel = Label(loyaltyMenuFrame,text = loyaltyArrayHeading[loop3], font = ("Helvetica"), width = 11, height = 1)
             loyaltyArrayHeadingLabel.place(x = a, y = b)
         a = a + 100
-    if printButton == True:
-        getScrollbarValuesButton.invoke()
 
 #Subroutine callable to edit items selected in the Previous Parcels Database
 def previousParcelsEditor(editValue,editValue2,editValue3,x,y,editType,previousParcelsDatabase,loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,scrollbar,movementRemaining):
@@ -1589,66 +1403,31 @@ def previousParcelsEditor(editValue,editValue2,editValue3,x,y,editType,previousP
             error("Invalid Datatype (Numbers only)")
     loyaltyMenuFrame.destroy()
     saveArray(editType,previousParcelsDatabase,lengthDatabase)
-    previousParcelsMenu(loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining,False)
+    previousParcelsMenu()
 
 #Subroutine callable to load the Previous Parcels Menu
-def previousParcelsMenu(subMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining,printButton):
-    page = "loyalty"
-    editType = "previousParcels"
-    #Firstly, the Previous Parcels database and length database are loaded
-    previousParcelsDatabase = loadArray(editType)
-    lengthDatabase = getArrayLength()
-    subMenuFrame.destroy()
+def previousParcelsMenu():
+    previousParcelsDatabase = loadArray("loyalty")
     #Then the frame is created
-    loyaltyMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    loyaltyMenuFrame.pack()
+    loyaltyMenuFrame = createDefaultFrame("loyalty")
     #Next a canvas is created with an assigned scrollbar
-    loyaltyCanvas = Canvas(loyaltyMenuFrame, bg = "white", width = 395, height = 460, scrollregion=(0,0,0,((int(lengthDatabase[4])*30)-20)), yscrollincrement = 30)
+    loyaltyCanvas = Canvas(loyaltyMenuFrame, bg = "white", width = 395, height = 460, scrollregion=(0,0,0,(((16)*30)-20)), yscrollincrement = 30)
     loyaltyCanvas.place(x = 480, y = 166)
     loyaltyScrollbar = Scrollbar(loyaltyMenuFrame, orient = "vertical", command = loyaltyCanvas.yview)
     loyaltyScrollbar.place(x = 440, y = 152, height = 482)
     loyaltyCanvas.config(yscrollcommand=loyaltyScrollbar.set)
-    #Then a temporary button is optionally created (this button will immediatly be pressed automatically in order to determine the initial position of the scrollbar)
-    if printButton == True:
-        movementRemaining = 0
-        getScrollbarValuesButton = Button(loyaltyMenuFrame,width = 1, height = 32)
-        getScrollbarValuesCommand = partial(getScrollbarValues,loyaltyScrollbar,subMenuFrame,status,usernameEntered,lengthDatabase,getScrollbarValuesButton,loyaltyMenuFrame,editType,mainMenuFrame)
-        getScrollbarValuesButton.config(command = getScrollbarValuesCommand)
-        getScrollbarValuesButton.place(x = 162, y = 152)
-    #Next, buttons to clear rows are placed into the frame
-    printClears(460,editType,previousParcelsDatabase,subMenuFrame,status,usernameEntered,mainMenuFrame,loyaltyMenuFrame,lengthDatabase,loyaltyScrollbar,4,movementRemaining)
-    getEditValueCommand = partial(getEditValue,editType,previousParcelsDatabase,loyaltyMenuFrame,subMenuFrame,status,usernameEntered,lengthDatabase,loyaltyScrollbar,movementRemaining)
     #Then the back button and Parcel icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,loyaltyMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining)
-    backButton = Button(loyaltyMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
     parcelIcon = PhotoImage(file = "images/parcelIcon.gif")
     parcelLabel = Label(loyaltyMenuFrame,image = parcelIcon, bg = "white", width = 60, height = 60)
     parcelLabel.image = parcelIcon
     parcelLabel.place(x = 1300, y = 0)
-    a = 48
-    b = 0
-    #Iteration is then used to place buttons on the canvas displaying each item in the stock database (on press allowing for the editing of the item should the user be permitted)
-    for loop in range(int(lengthDatabase[4])):
-        loop2 = 0
-        for loop2 in range(4):
-            previousParcelsArrayLabel = Button(text = previousParcelsDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1,command = getEditValueCommand)
-            loyaltyCanvas.create_window(a, b, window=previousParcelsArrayLabel)
-            a = a + 100
-        a = 48
-        b = b + 30
-    parcelArrayHeading = ["ParcelID", "CustomerID", "Time", "Date"]
     a = 480
     b = 125
     #Finally, headings are placed onto the table
-    for loop3 in range(4):
-        parcelArrayHeadingLabel = Label(loyaltyMenuFrame,text = parcelArrayHeading[loop3], font = ("Helvetica"), width = 11, height = 1)
+    for _ in range(4):
+        parcelArrayHeadingLabel = Label(loyaltyMenuFrame,text = "test", font = ("Helvetica"), width = 11, height = 1)
         parcelArrayHeadingLabel.place(x = a, y = b)
         a = a + 100
-    if printButton == True:
-        getScrollbarValuesButton.invoke()
 
 #Subroutine callable to edit items selected in the Parcel Database
 def parcelEditor(editValue,editValue2,editValue3,x,y,editType,parcelDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,scrollbar,movementRemaining):
@@ -1722,296 +1501,175 @@ def parcelEditor(editValue,editValue2,editValue3,x,y,editType,parcelDatabase,sub
     parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,False)
 
 #Subroutine callable to load the Parcel Menu
-def parcelMenu(mainMenuFrame,status,usernameEntered,lengthDatabase,movementRemaining,printButton):
-    page = "sub"
-    editType = "parcels"
+def parcelMenu():
     #Firstly, the Parcel database and length database are loaded
-    lengthDatabase = getArrayLength()
-    parcelDatabase = loadArray("parcels")
-    mainMenuFrame.destroy()
+    parcels = loadArray("parcels")
     #Then the frame is created
-    subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    subMenuFrame.pack()
+    parcelFrame = createDefaultFrame("sub")
     #Next a canvas is created with an assigned scrollbar
-    parcelCanvas = Canvas(subMenuFrame, bg = "white", width = 395, height = 460, scrollregion=(0,0,0,((int(lengthDatabase[3])*30)-20)), yscrollincrement = 30)
+    parcelCanvas = Canvas(parcelFrame, bg = "white", width = 395, height = 460, scrollregion=(0,0,0,290), yscrollincrement = 30)
     parcelCanvas.place(x = 480, y = 166)
-    parcelScrollbar = Scrollbar(subMenuFrame, orient = "vertical", command = parcelCanvas.yview)
+    parcelScrollbar = Scrollbar(parcelFrame, orient = "vertical", command = parcelCanvas.yview)
     parcelScrollbar.place(x = 440, y = 152, height = 482)
     parcelCanvas.config(yscrollcommand=parcelScrollbar.set)
-    #Then a temporary button is optionally created (this button will immediatly be pressed automatically in order to determine the initial position of the scrollbar)
-    if printButton == True:
-        movementRemaining = 0
-        getScrollbarValuesButton = Button(subMenuFrame,width = 1, height = 32)
-        getScrollbarValuesCommand = partial(getScrollbarValues,parcelScrollbar,mainMenuFrame,status,usernameEntered,lengthDatabase,getScrollbarValuesButton,subMenuFrame,editType,None)
-        getScrollbarValuesButton.config(command = getScrollbarValuesCommand)
-        getScrollbarValuesButton.place(x = 162, y = 152)
     #Next, buttons to clear rows are placed into the frame
-    printClears(460,editType,parcelDatabase,mainMenuFrame,status,usernameEntered,None,subMenuFrame,lengthDatabase,parcelScrollbar,1,movementRemaining)
-    getEditValueCommand = partial(getEditValue,editType,parcelDatabase,subMenuFrame,mainMenuFrame,status,usernameEntered,lengthDatabase,parcelScrollbar,movementRemaining)
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
-    backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
-    #Then the back button and Parcel icon are placed
-    parcelIcon = PhotoImage(file = "images/parcelIcon.gif")
-    parcelLabel = Label(subMenuFrame,image = parcelIcon, bg = "white", width = 60, height = 60)
-    parcelLabel.image = parcelIcon
+    printClears(460, parcelFrame)
+    parcelLabel = Label(parcelFrame,image = images["parcel"], bg = "white", width = 60, height = 60)
     parcelLabel.place(x = 1300, y = 0)
     #Next, buttons linking to the Loyalty Scheme and Previous Parcels menus are placed
-    loyaltyMenuCommand = partial(loyaltyMenu,subMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining,True)
-    loyaltyButton = Button(subMenuFrame,text = "Loyalty Scheme", fg = "white", bg = "black", font = ("Helvetica", 15), command = loyaltyMenuCommand)
+    loyaltyButton = Button(parcelFrame,text = "Loyalty Scheme", fg = "white", bg = "black", font = ("Helvetica", 15), command = loyaltyMenu)
     loyaltyButton.place(x = 150, y = 700)
-    previousParcelsMenuCommand = partial(previousParcelsMenu,subMenuFrame,status,usernameEntered,mainMenuFrame,lengthDatabase,movementRemaining,True)
-    previousParcelsButton = Button(subMenuFrame,text = "Previous Parcels", fg = "white", bg = "black", font = ("Helvetica", 15), command = previousParcelsMenuCommand)
+    previousParcelsButton = Button(parcelFrame,text = "Previous Parcels", fg = "white", bg = "black", font = ("Helvetica", 15), command = previousParcelsMenu)
     previousParcelsButton.place(x = 350, y = 700)
-    a = 48
-    b = 0
+    position = 48
     #Iteration is then used to place buttons on the canvas displaying each item in the stock database (on press allowing for the editing of the item should the user be permitted)
-    for loop in range(int(lengthDatabase[3])):
-        loop2 = 0
-        for loop2 in range(4):
-            parcelArrayLabel = Button(text = parcelDatabase[loop][loop2], font = ("Helvetica"), width = 10, height = 1, command = getEditValueCommand)
-            parcelCanvas.create_window(a, b, window=parcelArrayLabel)
-            a = a + 100
-        a = 48
-        b = b + 30
-    parcelArrayHeading = ["ParcelID", "CustomerID", "Time", "Date"]
-    a = 480
-    b = 125
     #Finally, headings are placed onto the table
-    for loop3 in range(4):
-        parcelArrayHeadingLabel = Label(subMenuFrame,text = parcelArrayHeading[loop3], font = ("Helvetica"), width = 11, height = 1)
-        parcelArrayHeadingLabel.place(x = a, y = b)
-        a = a + 100
-    if printButton == True:
-        getScrollbarValuesButton.invoke()
-
-#Subroutine callable to display confirmation of sucessful Mobile top-up verification and adjust the profit
-def confirmMobile(window3,membership):
-    #Firstly, the message is displayed
-    messagebox.showinfo(title = "Confirmation", message = "Top-up Complete")
-    #Next, profit is loaded
-    profit = float(getProfit())
-    #Then the discout is applied
-    if membership == "None":
-        profit = float(profit + 0.30)
-    if membership == "Bronze":
-        profit = float(profit + 0.25)
-    if membership == "Silver":
-        profit = float(profit + 0.20)
-    if membership == "Gold":
-        profit = float(profit + 0.15)
-    saveProfit(profit)
-    #Finally profit is saved
-    window3.destroy()
+    for _ in range(4):
+        parcelArrayHeadingLabel = Label(parcelFrame,text = "temp", font = ("Helvetica"), width = 11, height = 1)
+        parcelArrayHeadingLabel.place(x = position, y = 0)
+        position += 100
 
 #Subroutine callable to validate entered Mobile Top-up information, and to open a window where the user can verify the details
-def mobileEnter(subMenuFrame,phoneNumberEntry,serviceProvider,topUpAmountEntry,membership):
+def enterMobileInfo(phoneNumber,serviceProvider,topUpAmount,membership):
     #Firstly, Mobile Top-up information is saved into variables
-    phoneNumber = phoneNumberEntry.get()
-    serviceProviderStr = serviceProvider.get()
-    topUpAmount = topUpAmountEntry.get()
-    membershipStr = membership.get()
     count = 0
     #Then top-up information is validated (launching an error should it fail validation)
-    if phoneNumber == "":
-        error("Please enter a phone number")
-    elif phoneNumber.isnumeric() == True:
-        if len(phoneNumber) == 11:
-            count = count + 1
-        else:
-            error("Invalid Length (Must be 11 characters)")
-    if serviceProviderStr == "":
+    if phoneNumber == "" or phoneNumber.isnumeric() == False:
+        error("Please enter a valid phone number")
+    if topUpAmount == "" or topUpAmount.isnumeric() == False:
+        error("Please enter a valid top-up amount")
+    if serviceProvider == "":
         error("Please enter a service provider")
     else:
-        count = count + 1
-    if topUpAmount == "":
-        error("Please enter a top-up amount")
-    elif topUpAmount.isnumeric() == True:
-        if len(topUpAmount) < 6:
-            count = count + 1
-        else:
+        if len(phoneNumber) != 11:
+            error("Invalid Length (Must be 11 characters)")
+        if len(topUpAmount) >= 6:
             error("Invalid Length (Must be under 6 characters)")
-    if count == 3:
-        #Next, a window is opened where the user can verify information
-        mobileArray = [phoneNumber, serviceProviderStr, topUpAmount, membershipStr]
-        mobileArrayTitle = ["Phone Number:", "Service Provider:", "Top-Up Amount:", "Membership:"]
-        window3 = Tk()
-        window3.geometry("400x200")
-        window3.title("Detail verification")
-        window3.configure(bg = "white")
-        mobileCanvas = Canvas(window3, bg="white", height=200, width=400)
-        mobileCanvas.pack()
-        text1 = mobileCanvas.create_text(145,20, text = "Are these details correct?", font = ("Helvetica",15))
-        y = 80
-        for x in range(len(mobileArray)):
-            arrayTitle = mobileCanvas.create_text(60,y, text = mobileArrayTitle[x])
-            arrayText = mobileCanvas.create_text(200,y, text = mobileArray[x])
-            y = y + 20
-        confirmMobileCommand = partial(confirmMobile,window3,membershipStr)
-        mobileConfirmationButton = Button(window3, text = "Confirm", font = ("Helvetica",15), command = confirmMobileCommand)
-        mobileCanvas.create_window(340, 160, window=mobileConfirmationButton)
+        else:
+            #Next, profit is loaded
+            profit = float(getProfit())
+            #Then the discout is applied
+            if membership == "None":
+                profit = profit + 0.30
+            if membership == "Bronze":
+                profit = profit + 0.25
+            if membership == "Silver":
+                profit = profit + 0.20
+            if membership == "Gold":
+                profit = profit + 0.15
+            messagebox.showinfo(title = "Confirmation", message = "Top-up Complete")
+            saveProfit(profit)
+            #Finally profit is saved
 
 #Subroutine callable to load the Mobile Top-up Menu
-def mobileMenu(mainMenuFrame,status,usernameEntered):
-    page = "sub"
-    mainMenuFrame.destroy()
+def mobileMenu():
     #Firstly, the frame is created
-    subMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    subMenuFrame.pack()
-    #Next the back button and Mobile Top-up icon are placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,subMenuFrame,status,usernameEntered,mainMenuFrame,None,None)
-    backButton = Button(subMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
-    mobileIcon = PhotoImage(file = "images/mobileIcon.gif")
-    mobileLabel = Label(subMenuFrame,image = mobileIcon, bg = "white", width = 50, height = 60)
-    mobileLabel.image = mobileIcon
+    mobileFrame = createDefaultFrame("sub")
+    mobileLabel = Label(mobileFrame,image = images["mobile"], bg = "white", width = 50, height = 60)
     mobileLabel.place(x = 1200, y = 0)
     #Then labels and entry boxes are placed where the user can input information
-    phoneNumberLabel = Label(subMenuFrame,bg = "white", font = ("Helvetica", 19), text = "Phone Number", height = 1, width = 15)
+    phoneNumberLabel = Label(mobileFrame,bg = "white", font = ("Helvetica", 19), text = "Phone Number", height = 1, width = 15)
     phoneNumberLabel.place(x = 165, y = 291)
-    phoneNumberEntry = Entry(subMenuFrame,bg = "white", font = ("Helvetica", 20), width = 40)
-    phoneNumberEntry.place(x = 400, y = 290)
-    serviceProviderLabel = Label(subMenuFrame,bg = "white", font = ("Helvetica", 19), text = "Service Provider", height = 1, width = 15)
+    phoneNumberTextBox = Entry(mobileFrame,bg = "white", font = ("Helvetica", 20), width = 40)
+    phoneNumberTextBox.place(x = 400, y = 290)
+    serviceProviderLabel = Label(mobileFrame,bg = "white", font = ("Helvetica", 19), text = "Service Provider", height = 1, width = 15)
     serviceProviderLabel.place(x = 165, y = 331)
     serviceProvider = StringVar(window)
     serviceProvider.set("")
-    serviceProviderEntry = OptionMenu(subMenuFrame,serviceProvider, "EE", "Three", "Vodafone", "O2")
+    serviceProviderEntry = OptionMenu(mobileFrame,serviceProvider, "EE", "Three", "Vodafone", "O2")
     serviceProviderEntry.configure(bg = "white", font = ("Helvetica", 13), width = 62, height = 1)
     serviceProviderEntry.place(x = 400, y = 330)
-    topUpAmountLabel = Label(subMenuFrame,bg = "white", font = ("Helvetica", 19), text = "Top-up Amount (£)", height = 1, width = 15)
+    topUpAmountLabel = Label(mobileFrame,bg = "white", font = ("Helvetica", 19), text = "Top-up Amount (£)", height = 1, width = 15)
     topUpAmountLabel.place(x = 165, y = 371)
-    topUpAmountEntry = Entry(subMenuFrame,bg = "white", font = ("Helvetica", 20), width = 40)
-    topUpAmountEntry.place(x = 400, y = 370)
-    membershipLabel = Label(subMenuFrame,bg = "white", font = ("Helvetica", 19), text = "Membership", height = 1, width = 15)
+    topUpAmountTextBox = Entry(mobileFrame,bg = "white", font = ("Helvetica", 20), width = 40)
+    topUpAmountTextBox.place(x = 400, y = 370)
+    membershipLabel = Label(mobileFrame,bg = "white", font = ("Helvetica", 19), text = "Membership", height = 1, width = 15)
     membershipLabel.place(x = 165, y = 411)
     membership = StringVar(window)
     membership.set("None")
-    membershipEntry = OptionMenu(subMenuFrame, membership, "None", "Bronze", "Silver", "Gold")
+    membershipEntry = OptionMenu(mobileFrame, membership, "None", "Bronze", "Silver", "Gold")
     membershipEntry.configure(bg = "white", font = ("Helvetica", 13), width = 62, height = 1)
     membershipEntry.place(x = 400, y = 410)
-    mobileEnterCommand = partial(mobileEnter,subMenuFrame,phoneNumberEntry,serviceProvider,topUpAmountEntry,membership)
-    mobileButton = Button(subMenuFrame,text = "Enter Details", bg = "black", fg = "white", font = ("Helvetica", 20), command = mobileEnterCommand)
+    mobileEnterCommand = partial(enterMobileInfo,phoneNumberTextBox.get(),serviceProvider,topUpAmountTextBox.get(),membership)
+    mobileButton = Button(mobileFrame,text = "Enter Details", bg = "black", fg = "white", font = ("Helvetica", 20), command = mobileEnterCommand)
     mobileButton.place(x = 165, y = 450)
-    
-#Subroutine callable to load the Main Menu
-def mainMenu(status,usernameEntered,loginFrame):
-    if loginFrame!= None:
-        loginFrame.destroy()
-    page = "main"
+
+def createDefaultFrame(page):
     #Firstly, the frame is created
-    mainMenuFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    mainMenuFrame.pack()
+    frame = Frame(window, height = 1080, width = 1920, bg = "black")
+    frame.pack()
     #Next the back button is placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,mainMenuFrame,status,usernameEntered,None,None,None)
-    backButton = Button(mainMenuFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
+    backButton = Button(frame,image = images['back.gif'] , bg = "white", command = lambda:[frame.destroy(), back(page)])
     backButton.place(x = 0, y = 0)
+    return frame
+
+#Subroutine callable to load the Main Menu
+def mainMenu():
+    mainMenuFrame = createDefaultFrame("main")
     #Next labels showing the user's status and username are placed
-    statusLabel = Label(mainMenuFrame, text = ("Status=",status), fg = "white", bg = "black", font = ("Helvetica", 15))
-    statusLabel.place(x = 1230, y = 0)
-    welcomeLabel = Label(mainMenuFrame, text = ("Welcome",usernameEntered), fg = "white", bg = "black", font = ("Helvetica", 15))
+    welcomeLabel = Label(mainMenuFrame, text = ("Welcome","test"), fg = "white", bg = "black", font = ("Helvetica", 15))
     welcomeLabel.place(x = 580, y = 0)
-    #Next, hyperlinks to each system are placed
-    stockIcon = PhotoImage(file = "images/stockIcon.gif")
-    stockMenuCommand = partial(stockMenu,mainMenuFrame,status,usernameEntered,None,None,True,None)
-    stockMenuButton = Button(mainMenuFrame, image = stockIcon, bg = "white", command = stockMenuCommand)
-    stockMenuButton.image = stockIcon
+    #Next, links to each system are placed
+    stockMenuButton = Button(mainMenuFrame, image = images["stock.gif"], bg = "white", command = lambda:[mainMenuFrame.destroy(), stockMenu()])
     stockMenuButton.place(x = 390, y = 300, width = 200)
-    shiftIcon = PhotoImage(file = "images/shiftIcon.gif")
-    shiftMenuCommand = partial(shiftMenu,mainMenuFrame,status,usernameEntered,None,None,True)
-    shiftMenuButton = Button(mainMenuFrame, image = shiftIcon, bg = "white", command = shiftMenuCommand)
-    shiftMenuButton.image = shiftIcon
+    shiftMenuButton = Button(mainMenuFrame, image = images["shift.gif"], bg = "white", command = lambda:[mainMenuFrame.destroy(), shiftMenu()])
     shiftMenuButton.place(x = 590, y = 300, width = 200)
-    billIcon = PhotoImage(file = "images/billIcon.gif")
-    billMenuCommand = partial(billMenu,mainMenuFrame,status,usernameEntered)
-    billMenuButton = Button(mainMenuFrame, image = billIcon, bg = "white", command = billMenuCommand)
-    billMenuButton.image = billIcon
+    billMenuButton = Button(mainMenuFrame, image = images["bill.gif"], bg = "white", command = lambda:[mainMenuFrame.destroy(), billMenu()])
     billMenuButton.place(x = 790, y = 300, width = 200)
-    wuIcon = PhotoImage(file = "images/wuIcon.gif")
-    wuMenuCommand = partial(wuMenu,mainMenuFrame,status,usernameEntered)
-    wuMenuButton = Button(mainMenuFrame, image = wuIcon, bg = "white", command = wuMenuCommand)
-    wuMenuButton.image = wuIcon
+    wuMenuButton = Button(mainMenuFrame, image = images["wu.gif"], bg = "white", command = lambda:[mainMenuFrame.destroy(), wuMenu()])
     wuMenuButton.place(x = 390, y = 371, width = 200)
-    parcelIcon = PhotoImage(file = "images/parcelIcon.gif")
-    parcelMenuCommand = partial(parcelMenu,mainMenuFrame,status,usernameEntered,None,None,True)
-    parcelMenuButton = Button(mainMenuFrame, image = parcelIcon, bg = "white", command = parcelMenuCommand)
-    parcelMenuButton.image = parcelIcon
+    parcelMenuButton = Button(mainMenuFrame, image = images["parcel.gif"], bg = "white", command = lambda:[mainMenuFrame.destroy(), parcelMenu()])
     parcelMenuButton.place(x = 590, y = 371, width = 200)
-    mobileIcon = PhotoImage(file = "images/mobileIcon.gif")
-    mobileMenuCommand = partial(mobileMenu,mainMenuFrame,status,usernameEntered)
-    mobileMenuButton = Button(mainMenuFrame, image = mobileIcon, bg = "white", command = mobileMenuCommand)
-    mobileMenuButton.image = mobileIcon
+    mobileMenuButton = Button(mainMenuFrame, image = images["mobile.gif"], bg = "white", command = lambda:[mainMenuFrame.destroy(), mobileMenu()])
     mobileMenuButton.place(x = 790, y = 371, width = 200)
 
 #Subroutine callable to process login attempts
-def loginAttempt(loginFrame,usernameEntry,passwordEntry):
-    #Firstly, the entered username and password are saved into variables
-    usernameEntered = usernameEntry.get()
-    passwordEntered = passwordEntry.get()
-    username = None
-    password = None
-    status = None
-    #Then the Shift Database and Length Database are loaded
-    shiftDatabase = loadArray("shifts")
-    lengthDatabase = getArrayLength()
+def loginAttempt(usernameEntered,passwordEntered):
+    #The Shift Database is loaded
+    shifts = loadArray("shifts")
     #Next, each name in the shift database is compared to the username entered
-    for loop in range(1,int(lengthDatabase[1])):
-        nameList = shiftDatabase[loop][1].split(" ")
-        name = nameList[0] + nameList[1]
-        if usernameEntered == name:
-            username = "correct"
-            status = "user"
-    #The username entered is then compared to the admin username
-    adminNameList = shiftDatabase[0][1].split(" ")
-    adminName = adminNameList[0] + adminNameList[1]
-    #Appropriate errors are displayed should usernames or passwords not match
-    if usernameEntered == adminName:
-        status = "admin"
-        username = "correct"
-    if (status == "user" and passwordEntered == "UserPass123") or (status == "admin" and passwordEntered == "AdminPass123"):
-        password = "correct"
-    if username != "correct" and password != "correct":
-        error("Incorrect Username and Password")
-    elif username != "correct" and password == "correct":
+    destination = "login"
+    status = "user"
+    usernameAccepted = False
+    for loop in range(len(shifts)):
+        print(usernameEntered, " == ", shifts[loop][1])
+        if usernameEntered == shifts[loop][1]:
+            usernameAccepted = True
+            break
+    if usernameAccepted != True:
         error("Incorrect Username")
-    elif username == "correct" and password != "correct":
-        error("Incorrect Password")
+    #Appropriate errors are displayed should usernames or passwords not match
     else:
-        #If username and password are correct, the Main Menu is opened
-        mainMenu(status,usernameEntered,loginFrame)
+        if usernameEntered == shifts[0][1]:
+            status = "admin"
+        if (status == "user" and passwordEntered == "UserPass123") or (status == "admin" and passwordEntered == "AdminPass123"):
+            destination = "main"
+        else:
+            error("Incorrect Password")
+    #If username and password are correct, the Main Menu is opened
+    goToScreen(destination)
 
 #Subroutine callable to open the Login Menu
 def loginMenu():
     page = "login"
     #Firstly, the frame is created
-    loginFrame = Frame(window, height = 1080, width = 1920, bg = "black")
-    loginFrame.pack()
+    loginFrame = createDefaultFrame("login")
     #Next labels and entry boxes are placed so that a username and password may be entered
     loginLabel = Label(loginFrame, text = "Please Login", font = ("Helvetica", 15), fg = "white", bg = "black")
     loginLabel.place(x = 625, y = 100)
-    usernameEntry = Entry(loginFrame, font = ("Helvetica",15), fg = "white", bg = "black")
-    usernameEntry.place(x = 665, y = 350, height = 30, width = 200)
+    usernameTextBox = Entry(loginFrame, font = ("Helvetica",15), fg = "white", bg = "black")
+    usernameTextBox.place(x = 665, y = 350, height = 30, width = 200)
     usernameLabel = Label(loginFrame, text = "Username", font = ("Helvetica",15), fg = "white", bg = "black")
     usernameLabel.place(x = 515, y = 350)
-    passwordEntry = Entry(loginFrame, show = "*", font = ("Helvetica",15), fg = "white", bg = "black")
-    passwordEntry.place(x = 665, y = 400, height = 30, width = 200)
+    passwordTextBox = Entry(loginFrame, show = "*", font = ("Helvetica",15), fg = "white", bg = "black")
+    passwordTextBox.place(x = 665, y = 400, height = 30, width = 200)
     passwordLabel = Label(loginFrame, text = "Password", font = ("Helvetica",15), fg = "white", bg = "black")
     passwordLabel.place(x = 515, y = 400)
-    loginAttemptCommand = partial(loginAttempt,loginFrame,usernameEntry,passwordEntry)
-    enterButton = Button(loginFrame, text = "Enter", font = ("Helvetica",15), fg = "white", bg = "black", command = loginAttemptCommand)
+
+    enterButton = Button(loginFrame, text = "Enter", font = ("Helvetica",15), fg = "white", bg = "black", 
+                         command = lambda:[loginAttempt(usernameTextBox.get(),passwordTextBox.get()),loginFrame.destroy()])
     enterButton.place(x = 650, y = 500)
-    #Finally, the back button is placed
-    backIcon = PhotoImage(file = "images/backIcon.gif")
-    backCommand = partial(back,page,window,None,None,None,None,None)
-    backButton = Button(loginFrame,image = backIcon, bg = "white", command = backCommand)
-    backButton.image = backIcon
-    backButton.place(x = 0, y = 0)
     window.mainloop()
-    
-#The system begins with the running of the Login Menu
+
+loadImages()
 loginMenu()
