@@ -1,3 +1,0 @@
-001,NasserAbdallah,02837583925,09:00 - 13:00,0 Hours,10/h,
-002,KamalAbdallah,08463927564,13:00 - 18:00,0 Hours,8/h,
-003,SarahAbdallah,01745392845,18:00 - 21:00,0 Hours,8/h
