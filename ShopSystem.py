@@ -1,16 +1,10 @@
-#This system is designed for Abdallah and Sons - a general goods store
-#The Admin username is "NasserAbdallah", and the admin password is "AdminPass123"
-#The default usernames for non admin users are "KamalAbdallah" and "SarahAbdallah" (more are created with the names in the shift Menu)
-#, the password for non admins is "UserPass123"
-
 #Tkinter libraries are imported
-from tkinter import *
-from tkinter import messagebox
+from tkinter import CENTER, E, X, Button, Canvas, Entry, Frame, Label, Menu, Menubutton, OptionMenu, PhotoImage, Scrollbar, StringVar, Tk, messagebox
 from os import listdir
 from dataClasses import *
 
+profit = 0
 stock = []
-deliveries = []
 employees = []
 images = dict()
 
@@ -19,13 +13,19 @@ class GUI(Tk):
         saveFiles()
     def __init__(self):
         super().__init__()
+    def clear(self):
+        for child in self.winfo_children():
+            child.destroy()
 
 #Window is opended and set to fullscreen
 window = GUI()
-window.attributes('-fullscreen', True)
-window.geometry("1920x1080")
-window.title("Abdallah and Sons")
-window.configure(bg = "white")
+window.title("Stock System")
+window.geometry("900x600")
+window.configure(bg = "lightGray")
+
+mainFont = ("roboto",10)
+titleFont = ("roboto",15)
+bigFont = ("roboto,",20)
 
 mainCanvas = Canvas()
 
@@ -41,11 +41,12 @@ def createDefaultCanvas():
     scrollbar.place(relx = 1, rely = 0.5, anchor = E, relheight=1)
     mainCanvas.config(yscrollcommand=scrollbar.set)
     mainCanvas.grid_propagate(False)
+    mainCanvas.pack(pady = 50, anchor=CENTER, expand = True)
 
 #Subroutine callable to save 2D arrays into text files
 def saveFiles():
-    global deliveries, employees, stock
-    arrays = [deliveries, employees, stock]
+    global employees, stock
+    arrays = [employees, stock]
     for array in arrays:
         file = open(array[0].getPath(), "w")
         for object in array:
@@ -66,9 +67,7 @@ def loadFiles():
             if line == "":
                 break
             fields = line.split(",")
-            if file.name == "classes/deliveries.txt":
-                deliveries.append(DeliveryData(fields))
-            elif file.name == "classes/employees.txt":
+            if file.name == "classes/employees.txt":
                 employees.append(EmployeeData(fields))
             elif file.name == "classes/stock.txt":
                 stock.append(StockData(fields))
@@ -77,49 +76,43 @@ def loadFiles():
 def loadImages():
     global images
     for imagePath in listdir("images"):
-        images.update({imagePath : PhotoImage(file = "images/" + imagePath)})
+        image = PhotoImage(file = "images/" + imagePath)
+        image = image.subsample(5)
+        images.update({imagePath : image})
 
 #Subroutine callable to display errors
 def error(errorMessage):
     messagebox.showerror(title = "Error", message = errorMessage)
 
-#Function callable to return the profit of the store from the Profit text file
-def getProfit():
-    profit = open("dataFiles/profit.txt")
-    return profit
-
-#Subroutine callable to save the profit of the store into the Profit text file
-def saveProfit(profit):
-    array = open("dataFiles/profit.txt", "w")
-    array.write(profit)
-
 def infoEntryHandler(event,object,attribute):
     object.__setattr__(attribute,event.widget.get())
 
-def formatTable(array):
+def formatTable(objects):
     global mainCanvas
-    attributes = list(vars(array[0]).keys())
-    for counter, attribute in enumerate(attributes):
-        attributeLabel = Label(mainCanvas, font = ("roboto",15), text=attribute, width = array[0].getCharLimit(counter))
-        attributeLabel.grid(row = 0, column = counter)
-    internalFrame = Frame(mainCanvas)
-    mainCanvas.create_window((0,attributeLabel.winfo_reqheight()), window = internalFrame, anchor = "nw")
-    for rowNum, object in enumerate(array,1):
-        for columnNum, attribute in enumerate(attributes):
-            field = Entry(internalFrame, width = object.getCharLimit(columnNum), font=("roboto",15))
-            field.insert(0, getattr(object, attribute, "none"))
-            field.bind("<KeyRelease>", lambda event, object = object, attribute = attribute: 
-                       infoEntryHandler(event,object,attribute))
-            field.grid(row = rowNum, column = columnNum)
-    scrollableDepth = (len(array) * field.winfo_reqheight())
+    attributes = list(vars(objects[0]).keys())
+    fieldsContainer = Frame(mainCanvas)
+    headersContainer = Frame(mainCanvas)
+    mainCanvas.create_window((0,0), width = mainCanvas.winfo_reqwidth(), window = headersContainer, anchor = "nw")
+    mainCanvas.create_window((0,0), width = mainCanvas.winfo_reqwidth(), window = fieldsContainer, anchor = "nw")
+    for column, attribute in enumerate(attributes):
+        header = Label(headersContainer, text = attribute)
+        header.grid(row = 0, column = column)
+        headersContainer.grid_columnconfigure(index=column, weight = 1)
+        fieldsContainer.grid_columnconfigure(index=column, weight = 1)
+        for row, object in enumerate(objects):
+            field = Entry(fieldsContainer)
+            field.insert(0,getattr(object, attribute))
+            field.bind("<KeyRelease>", 
+                 lambda event,object = object, attribute = attribute: infoEntryHandler(event,object,attribute))
+            field.grid(row = row, column = column)
+    scrollableDepth = (len(objects) * field.winfo_reqheight())
     mainCanvas.config(scrollregion = (0,0,0,scrollableDepth))
-    mainCanvas.pack(pady = 200, anchor=CENTER, expand = True)
 
 #Subroutine callable to load the Stock Menu
 def stockMenu():
     global stock
     createDefaultCanvas()
-    fields = formatTable(stock)
+    formatTable(stock)
 
 #Subroutine callable to load the Shift Menu
 def employeeMenu():
@@ -127,31 +120,32 @@ def employeeMenu():
     createDefaultCanvas()
     formatTable(employees)
 
-#Subroutine callable to load the Parcel Menu
-def deliveryMenu():
-    global deliveries
-    createDefaultCanvas()
-    formatTable(deliveries)
+def logout():
+    window.clear()
+    loginMenu()
+
+def changePassword():
+    print("password_changed")
 
 #Subroutine callable to load the Main Menu
 def mainMenu():
     #Next, links to each system are placed
     navBar = Frame(window, background = "black")
-    backButton = Button(navBar, image = images["back.gif"], command = window.destroy)
-    backButton.grid(row = 0, column = 0, padx=(0,90))
-    stockMenuButton = Button(navBar, image = images['stock.gif'], command = stockMenu)
-    stockMenuButton.grid(row = 0, column = 1)
-    shiftMenuButton = Button(navBar, image = images["shift.gif"], command = employeeMenu)
-    shiftMenuButton.grid(row = 0, column = 2)
-    parcelMenuButton = Button(navBar, image = images["parcel.gif"], command = deliveryMenu)
-    parcelMenuButton.grid(row = 0, column = 3)
-    navBar.pack(fill = X, anchor = "n")
-    window.mainloop()
+    stockMenuButton = Button(navBar, image = images['stock-icon.png'], command = stockMenu)
+    navBar.grid_anchor("center")
+    stockMenuButton.grid(column = 0, row = 0, padx = 50)
+    rotaMenuButton = Button(navBar, image = images["rota-icon.png"], command = employeeMenu)
+    rotaMenuButton.grid(column = 1, row = 0, padx = 50)
+    navBar.pack(fill = X, side = "top", anchor = "n")
+    profileButton = Menubutton(window, image = images["profile-icon.png"])
+    profileButton.menu = Menu(profileButton)
+    profileButton["menu"] = profileButton.menu
+    profileButton.menu.add_cascade(label = "Logout", command = logout)
+    profileButton.menu.add_cascade(label = "Change Password", command = changePassword)
+    profileButton.place(relx = 1, rely = 0, anchor = "ne")
 
 #Subroutine callable to process login attempts
 def loginAttempt(usernameEntered,passwordEntered):
-    #The Shift Database is loaded
-    #Next, each name in the shift database is compared to the username entered
     status = "user"
     usernameAccepted = False
     for employee in employees:
@@ -160,37 +154,38 @@ def loginAttempt(usernameEntered,passwordEntered):
             break
     if usernameAccepted != True:
         error("Incorrect Username")
-    #Appropriate errors are displayed should usernames or passwords not match
     else:
         if usernameEntered == employees[0].name:
             status = "admin"
         if (status == "user" and passwordEntered == "a") or (status == "admin" and passwordEntered == "a"):
+            window.clear()
             mainMenu()
-            return
         else:
             error("Incorrect Password")
-    loginMenu()
     #If username and password are correct, the Main Menu is opened
 
 #Subroutine callable to open the Login Menu
 def loginMenu():
-    loginFrame = Frame(width = 1920, height = 1080)
-    loginFrame.pack()
+    loginFrame = Frame(window, width = 500, height = 500)
+    loginFrame.grid_propagate(False)
+    loginFrame.grid_anchor("center")
+    loginFrame.pack(anchor = "center", pady = window.winfo_reqheight())
     #Next labels and entry boxes are placed so that a username and password may be entered
-    loginLabel = Label(loginFrame, text = "Please Login", font = ("Helvetica", 15), fg = "white", bg = "black")
-    loginLabel.place(x = 625, y = 100)
-    usernameTextBox = Entry(loginFrame, font = ("Helvetica",15), fg = "white", bg = "black")
-    usernameTextBox.place(x = 665, y = 350, height = 30, width = 200)
-    usernameLabel = Label(loginFrame, text = "Username", font = ("Helvetica",15), fg = "white", bg = "black")
-    usernameLabel.place(x = 515, y = 350)
-    passwordTextBox = Entry(loginFrame, show = "*", font = ("Helvetica",15), fg = "white", bg = "black")
-    passwordTextBox.place(x = 665, y = 400, height = 30, width = 200)
-    passwordLabel = Label(loginFrame, text = "Password", font = ("Helvetica",15), fg = "white", bg = "black")
-    passwordLabel.place(x = 515, y = 400)
-    enterButton = Button(loginFrame, text = "Enter", font = ("Helvetica",15), fg = "white", bg = "black", 
-                         command = lambda:[loginAttempt(usernameTextBox.get(),passwordTextBox.get()),loginFrame.destroy()])
-    enterButton.place(x = 650, y = 500)
+    loginLabel = Label(loginFrame, text = "Please Login", font = bigFont)
+    loginLabel.grid(column = 0, row = 0, pady = 10, columnspan = 2)
+    usernameLabel = Label(loginFrame, text = "Username", font = titleFont)
+    usernameLabel.grid(column = 0, row = 1, pady = 10)
+    usernameEntry = Entry(loginFrame, font = mainFont)
+    usernameEntry.grid(column = 1, row = 1, pady = 10)
+    passwordLabel = Label(loginFrame, text = "Password", font = titleFont)
+    passwordLabel.grid(column = 0, row = 2, pady = 10)
+    passwordEntry = Entry(loginFrame, show = "*", font = mainFont)
+    passwordEntry.grid(column = 1, row = 2, pady = 10)
+    enterButton = Button(loginFrame, text = "Enter", font = mainFont, 
+                         command = lambda:[loginAttempt(usernameEntry.get(),passwordEntry.get())])
+    enterButton.grid(row = 3, columnspan = 2)
 
 loadImages()
 loadFiles()
-mainMenu()
+loginMenu()
+window.mainloop()
