@@ -20,3 +20,18 @@ class EmployeeData:
         self.timeMissed = fields[5]
     def getPath(self):
         return "classes/employees.txt"
+
+class PasswordData:
+    def __init__(self,fields):
+        self.employeeId = fields[0]
+        self.password = fields[1]
+    def getPath(self):
+        return "classes/passwords.txt"
+    
+class RotaData:
+    def __init__(self,fields):
+        self.staff = fields[0]
+        self.date = fields[1]
+        self.position = fields[2]
+        self.shiftStart = fields[3]
+        self.shiftEnd = fields[4]
