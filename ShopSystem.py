@@ -252,7 +252,9 @@ def loginMenu():
     loginFrame.pack(anchor = "center", pady = 200)
     window.bind("<Return>", lambda e : enterButton.invoke())
 
-loadImages()
-loadFiles()
-loginMenu()
-window.mainloop()
+def main():
+    loadImages()
+    loadFiles()
+    loginMenu()
+    window.mainloop
+ main()
