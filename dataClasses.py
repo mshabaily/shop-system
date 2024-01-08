@@ -1,3 +1,8 @@
+stock = []
+employees = []
+passwords = []
+rota = []
+
 class StockData:
     def __init__(self,fields):
         self.itemId = fields[0]
@@ -7,6 +12,8 @@ class StockData:
         self.reorderPoint = fields[4]
         self.unitPrice = fields[5]
         self.lineValue = fields[6]
+    def forget(self):
+        stock.remove(self)
     def getPath(self):
         return "classes/stock.txt"
     
@@ -18,6 +25,8 @@ class EmployeeData:
         self.status = fields[3]
         self.timeWorked = fields[4]
         self.timeMissed = fields[5]
+    def forget(self):
+        employees.remove(self)
     def getPath(self):
         return "classes/employees.txt"
 
@@ -35,3 +44,5 @@ class RotaData:
         self.position = fields[2]
         self.shiftStart = fields[3]
         self.shiftEnd = fields[4]
+    def forget(self):
+        rota.remove(self)
