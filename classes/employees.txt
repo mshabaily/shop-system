@@ -1,0 +1,7 @@
+0,JohnSmith,0123456789,admin,35,1,
+1,AliceJohn,7815096423,manager,38,0,
+2,MichaelDavis,2957138460,manager,40,2,
+3,EmilyMiller,1038597246,staff,37,0,
+4,ChristopherLee,5741290836,staff,33,1,
+5,SusanTaylor,9863412075,staff,36,0,
+6,DavidWilson,3217058964,staff,39,3,
