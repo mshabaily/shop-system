@@ -1,5 +1,6 @@
 from tkinter import END, X, Entry, Frame, Menu, messagebox
 from settings import *
+from gui import window
 
 class Table:
     def __init__(self,objects,canvas):
@@ -37,7 +38,7 @@ def infoEntryHandler(event,object,attribute,field):
     global user
     if event.keysym == "Return" or event.keysym == "Escape":
         return
-    if user.status != "staff":
+    if window.authority != "staff":
         object.__setattr__(attribute,event.widget.get())
     else:
         messagebox.showerror("You do not have permission to change this")

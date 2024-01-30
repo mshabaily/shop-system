@@ -1,7 +1,7 @@
 from tkinter import *
 from os import listdir
 from data import *
-from gui import *
+from gui import window
 from table import *
 from settings import *
 
@@ -11,9 +11,6 @@ profit = 0
 images = dict()
 
 #Window is opended and set to fullscreen
-window = GUI()
-window.title("Stock System")
-window.geometry("900x600")
 window.configure(bg = windowBackground)
 mainCanvas = Canvas(bg = canvasBackground)
 
@@ -98,7 +95,7 @@ def changePasswordMenu():
 def addPermissions(menu):
     global user,employees
     permissions = [("Logout",logout),("Change Password",changePasswordMenu)]
-    if user.status == "admin":
+    if window.authority == "admin":
         loadEmployees = lambda args = employees: loadMenu(args)
         permissions += [("View Employee Info", loadEmployees)]
     for permission in permissions:
@@ -125,13 +122,11 @@ def mainMenu():
 
 #Subroutine callable to process login attempts
 def validateDetails(username,password):
-    global user
     usernameAccepted = False
     passwordAccepted = False
     for employee in employees:
         if username == employee.name:
             usernameAccepted = True
-            user = employee
             break
     if usernameAccepted == False:
         messagebox.showerror("Incorrect Username")
@@ -139,13 +134,15 @@ def validateDetails(username,password):
     for savedPassword in passwords:
         if savedPassword.employeeId == employee.employeeId and password == savedPassword.password:
             passwordAccepted = True
-            return(True)
+            return(accessMap[username])
     if passwordAccepted == False:
         messagebox.showerror("Incorrect Password")
         return(False)
     
 def loginAttempt(username, password):
-    if validateDetails(username, password):
+    access = validateDetails(username, password)
+    if access != "none":
+        window.authority = access
         window.clear()
         window.unbind_all("<Return>")
         mainMenu()

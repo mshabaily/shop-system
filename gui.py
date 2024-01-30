@@ -16,8 +16,13 @@ class GUI(Tk):
             file.close()
     def __init__(self):
         super().__init__()
+        self.authority : str
         self.defaultFont = font.nametofont("TkTextFont")
         self.defaultFont.configure(family= bodyFont[0], size= bodyFont[1], weight=font.NORMAL)
     def clear(self):
         for child in self.winfo_children():
             child.destroy()
+
+window = GUI()
+window.title("Stock System")
+window.geometry("900x600")
