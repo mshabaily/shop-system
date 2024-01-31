@@ -149,7 +149,7 @@ def loginAttempt(username, password):
 
 #Subroutine callable to open the Login Menu
 def loginMenu():
-    loginFrame = Frame(window, width = 500, height = 500, background= appColour)
+    loginFrame = Frame(window, height = window.winfo_screenheight(), width = window.winfo_screenwidth()/2, background= appColour)
     loginFrame.grid_propagate(False)
     loginFrame.grid_anchor("center")
     #Next labels and entry boxes are placed so that a username and password may be entered
