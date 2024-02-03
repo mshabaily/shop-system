@@ -5,6 +5,7 @@ from tkinter import font
 bodyFont = ("Bahnschrift",15)
 titleFont = ("Bahnschrift",20)
 tableFont = ("Bahnschrift",10)
+welcomeFont = ("Bahnschrift",50)
 appColour = "#8403fc"
 
 #Table Settings

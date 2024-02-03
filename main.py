@@ -1,8 +1,9 @@
+import copy
 from functools import partial
 from tkinter import *
 from os import listdir
 from data import *
-from gui import User, window
+from gui import User, updatePassword, window
 from table import *
 from settings import *
 
@@ -22,7 +23,7 @@ def createDefaultCanvas():
         mainCanvas.destroy()
     except:
         pass
-    mainCanvas = Canvas(window, background = "gray", width = 1000, height = 2000)
+    mainCanvas = Canvas(window, background = "white", width = 1000, height = 2000)
     scrollbar = Scrollbar(window, orient = "vertical", command = mainCanvas.yview)
     scrollbar.config(command = mainCanvas.yview)
     scrollbar.place(relx = 1, rely = 0.5, anchor = E, relheight=1)
@@ -41,13 +42,13 @@ def loadFiles():
                 break
             fields = line.split(",")
             if file.name == "classes/employees.txt":
-                employees.append(EmployeeData(fields))
+                EmployeeData(fields).save()
             elif file.name == "classes/stock.txt":
-                stock.append(StockData(fields))
+                StockData(fields).save()
             elif file.name =="classes/passwords.txt":
-                passwords.append(PasswordData(fields))
+                PasswordData(fields).save()
             elif file.name == "classes/rota.txt":
-                rota.append(RotaData(fields))
+                RotaData(fields).save()
         file.close()
 
 def loadImages():
@@ -65,20 +66,17 @@ def logout():
     window.clear()
     bootMenu()
 
-def changePassword(newPassword):
-    for savedPassword in passwords:
-        if savedPassword.employeeId == user.employeeId:
-            savedPassword.password = newPassword
-            break
-    messagebox.showinfo("Password Reset")
-
 def loadUserDetails():
     mainMenu()
-    loadMenu([window.user], accessLevel = "open")
+    display = copy.deepcopy(window.user)
+    delattr(display, "employeeId")
+    delattr(display,"status")
+    loadMenu([display], accessLevel = "open")
 
 def verifyPasswordChange():
     window.clear()
     mainMenu()
+    createDefaultCanvas()
     loginBox(target = lambda : loadUserDetails(), master = mainCanvas)
 
 def addPermissions(menu):
@@ -101,11 +99,19 @@ def mainMenu():
     rotaMenuButton = Button(navBar, image = images["rota-icon.png"], command = loadRota, border = 0)
     rotaMenuButton.grid(column = 1, row = 0, padx = 50)
     navBar.pack(fill = X, side = "top", anchor = "n")
+
     profileButton = Menubutton(window, image = images["profile-icon.png"])
     profileButton.menu = Menu(profileButton,tearoff=False)
     profileButton["menu"] = profileButton.menu
     addPermissions(profileButton.menu)
     profileButton.place(relx = 1, rely = 0, anchor = "ne")
+
+    helpButton = Menubutton(window, image = images["help-icon.png"])
+    helpButton.menu = Menu(helpButton, tearoff= False)
+    helpButton["menu"] = helpButton.menu
+    editRowsPopup = lambda: messagebox.showinfo("Help", "Use rightclick on the table to open the editing menu!") 
+    helpButton.menu.add_command(label = "Adding / Deleting Rows", command = editRowsPopup)
+    helpButton.place(relx = 0, rely = 0, anchor = "nw")
 
 #Subroutine callable to process login attempts
 def validateDetails(username,password):
@@ -141,25 +147,31 @@ def mapDetails():
             if password.employeeId == employee.employeeId:
                 detailsMapping.update({employee.name : password.password})
                 break
-    print(detailsMapping["JohnSmith"])
     
 def loginAttempt(username, password, target):
     profile = validateDetails(username, password)
     if profile == "none":
         return
     username = profile.name
-    window.user = User(username, detailsMapping[username], profile.status)
+    window.user = User(profile.employeeId, username, detailsMapping[username], profile.status)
     window.clear()
     window.unbind_all("<Return>")
     target()
 
 def bootMenu():
     window.user = None
-    loginBox(target = lambda: mainMenu(), master = window)
+    welcomeScreen = Frame(height = window.winfo_screenheight()/3, width = window.winfo_screenwidth(), bg = "white")
+    welcomeScreen.propagate(False)
+    title = Label(welcomeScreen, text = "Track My Stock", font = welcomeFont, bg = "white")
+    title.pack(anchor=CENTER, pady = 100)
+    welcomeScreen.pack()
+    loginScreen = Frame(height = window.winfo_screenheight()/3 * 2, width = window.winfo_screenwidth())
+    loginScreen.pack()
+    loginBox(target = lambda: mainMenu(), master = loginScreen)
 
 #Subroutine callable to open the Login Menu
 def loginBox(target, master):
-    loginFrame = Frame(window, height = window.winfo_screenheight() , width = window.winfo_screenwidth(), background= appColour)
+    loginFrame = Frame(master, height = master.winfo_screenheight() , width = master.winfo_screenwidth(), background= appColour)
     loginFrame.grid_propagate(False)
     loginFrame.grid_anchor("center")
     #Next labels and entry boxes are placed so that a username and password may be entered
@@ -176,7 +188,7 @@ def loginBox(target, master):
     loginCommand = lambda target = target: loginAttempt(usernameEntry.get(),passwordEntry.get(), target)
     enterButton = Button(loginFrame, text = "Enter", font = titleFont, command = loginCommand)
     enterButton.grid(row = 3, columnspan = 2)
-    loginFrame.pack(anchor = "center", pady = 200)
+    loginFrame.pack(anchor = "center")
     window.bind("<Return>", lambda e : enterButton.invoke())
 
 loadImages()

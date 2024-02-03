@@ -1,40 +1,40 @@
-101, Premium Coffee Blend, 123456789012, 150, 20, $8.99, $1348.50
-102, Laptop Backpack, 234567890123, 80, 10, $29.99, $2399.20
-103, Wireless Bluetooth Earbuds, 345678901234, 120, 15, $39.99, $4798.80
-104, Organic Green Tea, 456789012345, 200, 30, $5.99, $1198.00
-105, Leather Wallet, 567890123456, 50, 5, $19.99, $999.50
-106, Smart LED TV (42 inches), 678901234567, 30, 5, $499.99, $14999.70
-107, Fitness Tracker, 789012345678, 100, 10, $49.99, $4999.00
-108, Stainless Steel Water Bottle, 890123456789, 120, 15, $12.99, $1558.80
-109, Portable External Hard Drive, 901234567890, 50, 5, $79.99, $3999.50
-110, Desk Organizer Set, 012345678901, 60, 10, $24.99, $1499.40
-111, Men's Classic Watch, 123456789012, 100, 15, $69.99, $6999.00
-112, Bluetooth Portable Speaker, 234567890123, 80, 10, $34.99, $2799.20
-113, Professional Chef Knife Set, 345678901234, 40, 5, $59.99, $2399.60
-114, Yoga Mat, 456789012345, 120, 20, $15.99, $1918.80
-115, Digital Camera, 567890123456, 25, 3, $299.99, $7499.75
-116, Gaming Mouse, 678901234567, 70, 10, $49.99, $3499.30
-117, Women's Running Shoes, 789012345678, 90, 15, $39.99, $3599.10
-118, Stainless Steel Cookware Set, 890123456789, 35, 5, $129.99, $4549.65
-119, Wall Art Canvas Print, 901234567890, 50, 8, $29.99, $1499.50
-120, Wireless Charging Pad, 012345678901, 65, 10, $19.99, $1299.35
-121, Men's Leather Jacket, 123456789012, 30, 5, $149.99, $4499.70
-122, Bamboo Cutting Board Set, 234567890123, 55, 8, $19.99, $1099.45
-123, Noise-Canceling Headphones, 345678901234, 40, 5, $89.99, $3599.60
-124, Fitness Resistance Bands Set, 456789012345, 75, 12, $14.99, $1124.25
-125, Coffee Maker, 567890123456, 40, 5, $49.99, $1999.60
-126, Outdoor Folding Chair, 678901234567, 60, 10, $29.99, $1799.40
-127, Women's Fashion Sunglasses, 789012345678, 80, 15, $19.99, $1599.20
-128, Adjustable Dumbbell Set, 890123456789, 25, 3, $99.99, $2499.75
-129, Non-Stick Cooking Utensil Set, 901234567890, 45, 6, $24.99, $1124.55
-130, Home Office Desk, 012345678901, 30, 5, $149.99, $4499.70
-131, Men's Sports Shoes, 123456789012, 70, 12, $59.99, $4199.30
-132, Bluetooth Fitness Tracker, 234567890123, 90, 15, $29.99, $2699.10
-133, Portable Blender, 345678901234, 40, 5, $34.99, $1399.60
-134, Electric Kettle, 456789012345, 55, 8, $24.99, $1374.45
-135, Wireless Mouse, 567890123456, 25, 3, $19.99, $499.75
-136, Women's Backpack, 678901234567, 60, 10, $39.99, $2399.40
-137, Smart Thermostat, 789012345678, 40, 5, $89.99, $3599.60
-138, Compact Air Fryer, 890123456789, 75, 12, $69.99, $5249.25
-139, Men's Dress Shirt, 901234567890, 50, 8, $29.99, $1499.50
-140, UV-C Sanitizing Wand, 012345678901, 65, 10, $49.99, $3249.35
+101, Premium Coffee Blend, 123456789012, 150, 20, $8.99, $1348.50,
+102, Laptop Backpack, 234567890123, 80, 10, $29.99, $2399.20,
+103, Wireless Bluetooth Earbuds, 345678901234, 120, 15, $39.99, $4798.80,
+104, Organic Green Tea, 456789012345, 200, 30, $5.99, $1198.00,
+105, Leather Wallet, 567890123456, 50, 5, $19.99, $999.50,
+106, Smart LED TV (42 inches), 678901234567, 30, 5, $499.99, $14999.70,
+107, Fitness Tracker, 789012345678, 100, 10, $49.99, $4999.00,
+108, Stainless Steel Water Bottle, 890123456789, 120, 15, $12.99, $1558.80,
+109, Portable External Hard Drive, 901234567890, 50, 5, $79.99, $3999.50,
+110, Desk Organizer Set, 012345678901, 60, 10, $24.99, $1499.40,
+111, Men's Classic Watch, 123456789012, 100, 15, $69.99, $6999.00,
+112, Bluetooth Portable Speaker, 234567890123, 80, 10, $34.99, $2799.20,
+113, Professional Chef Knife Set, 345678901234, 40, 5, $59.99, $2399.60,
+114, Yoga Mat, 456789012345, 120, 20, $15.99, $1918.80,
+115, Digital Camera, 567890123456, 25, 3, $299.99, $7499.75,
+116, Gaming Mouse, 678901234567, 70, 10, $49.99, $3499.30,
+117, Women's Running Shoes, 789012345678, 90, 15, $39.99, $3599.10,
+118, Stainless Steel Cookware Set, 890123456789, 35, 5, $129.99, $4549.65,
+119, Wall Art Canvas Print, 901234567890, 50, 8, $29.99, $1499.50,
+120, Wireless Charging Pad, 012345678901, 65, 10, $19.99, $1299.35,
+121, Men's Leather Jacket, 123456789012, 30, 5, $149.99, $4499.70,
+122, Bamboo Cutting Board Set, 234567890123, 55, 8, $19.99, $1099.45,
+123, Noise-Canceling Headphones, 345678901234, 40, 5, $89.99, $3599.60,
+124, Fitness Resistance Bands Set, 456789012345, 75, 12, $14.99, $1124.25,
+125, Coffee Maker, 567890123456, 40, 5, $49.99, $1999.60,
+126, Outdoor Folding Chair, 678901234567, 60, 10, $29.99, $1799.40,
+127, Women's Fashion Sunglasses, 789012345678, 80, 15, $19.99, $1599.20,
+128, Adjustable Dumbbell Set, 890123456789, 25, 3, $99.99, $2499.75,
+129, Non-Stick Cooking Utensil Set, 901234567890, 45, 6, $24.99, $1124.55,
+130, Home Office Desk, 012345678901, 30, 5, $149.99, $4499.70,
+131, Men's Sports Shoes, 123456789012, 70, 12, $59.99, $4199.30,
+132, Bluetooth Fitness Tracker, 234567890123, 90, 15, $29.99, $2699.10,
+133, Portable Blender, 345678901234, 40, 5, $34.99, $1399.60,
+134, Electric Kettle, 456789012345, 55, 8, $24.99, $1374.45,
+135, Wireless Mouse, 567890123456, 25, 3, $19.99, $499.75,
+136, Women's Backpack, 678901234567, 60, 10, $39.99, $2399.40,
+137, Smart Thermostat, 789012345678, 40, 5, $89.99, $3599.60,
+138, Compact Air Fryer, 890123456789, 75, 12, $69.99, $5249.25,
+139, Men's Dress Shirt, 901234567890, 50, 8, $29.99, $1499.50,
+140, UV-C Sanitizing Wand, 012345678901, 65, 10, $49.99, $3249.35,

@@ -1,6 +1,6 @@
 from tkinter import END, X, Entry, Frame, Label, Menu, messagebox
 from settings import *
-from gui import window
+from gui import updatePassword, window
 
 class Table(Frame):
     def __init__(self,objects,canvas,accessLevel):
@@ -15,7 +15,7 @@ class Table(Frame):
         self.canvas.configure(background = canvasBackground)
         self.canvas.configure(highlightthickness = canvasBorderWidth, highlightbackground = canvasBorderColour)
         for row, item in enumerate(self.objects, 0):
-            rowContainer = Row(self.tableContainer, self)
+            rowContainer = Row(self.tableContainer, item, self)
             for column, attribute in enumerate(self.attributes):
                 rowContainer.grid_columnconfigure(index=column, weight = 1)
                 if row == 0:
@@ -24,30 +24,35 @@ class Table(Frame):
                 field = Item(rowContainer, item, attribute, self.accessLevel)
                 field.grid(row = row+1, column = column)
             rowContainer.pack(fill=X, anchor = "nw", pady = 1)
-        scrollableDepth = ((len(self.objects)+1) * field.winfo_reqheight())
+        objectCount = len(self.objects)+1
+        offsetDepth = (objectCount * canvasBorderWidth) + Label(font = bodyFont).winfo_reqheight() + (canvasBorderWidth *2)
+        scrollableDepth = (objectCount * field.winfo_reqheight()) + offsetDepth
         self.canvas.config(scrollregion = (0,0,0,scrollableDepth))
         self.menu = Menu(tearoff=False)
         self.menu.add_command(label = "Add Row", command = self.add)
-        self.bind("<Button-3>", lambda event: self.popup())
+        self.canvas.bind("<Button-3>", lambda event: self.popup())
     def popup(self):
         root = self.winfo_toplevel()
         self.menu.tk_popup(root.winfo_pointerx(), root.winfo_pointery())
     def clear(self):
-        for child in self.winfo_children():
+        for child in self.tableContainer.winfo_children():
             child.destroy()
     def add(self):
-        self.objects.append(self.objects[0])
+        newObj = type(self.objects[0])
+        newObj([]).save()
         self.clear()
         self.load()
         
 class Row(Frame):
-    def __init__(self, master, table, **kwargs):
+    def __init__(self, master, item, table, **kwargs):
         super().__init__(master, background= rowBorderColour, border = rowBorderWidth, **kwargs)
         self.menu = Menu(tearoff=False)
         self.menu.add_command(label = "Add Row", command = table.add)
-        self.menu.add_command(label = "Delete Row", command = self.delete)
+        self.menu.add_command(label = "Delete Row", command = lambda item = item : self.delete(item))
         self.bind("<Button-3>", lambda event: self.popup())
-    def delete(self):
+    def delete(self, item):
+        print(item)
+        item.__del__()
         self.destroy()
     def popup(self):
         root = self.winfo_toplevel()
@@ -60,6 +65,7 @@ def infoEntryHandler(event,object,attribute):
         return
     if window.user.status != "staff" or event.widget.accessLevel == "open":
         object.__setattr__(attribute,event.widget.get())
+        updatePassword()
     else:
         messagebox.showerror("You do not have permission to change this")
         event.widget.delete(0,END)
@@ -69,8 +75,7 @@ class Item(Entry):
     def __init__(self, master, item, attribute, accessLevel, **kwargs):
         super().__init__(master, font = tableFont, background= rowBackground, **kwargs)
         self.accessLevel = accessLevel
-        self.item = item
         self.insert(0,getattr(item, attribute))
-        response = lambda event, item = item, attribute = attribute, self = self: infoEntryHandler(event,item,attribute)
+        response = lambda event, item = item, attribute = attribute : infoEntryHandler(event,item,attribute)
         self.bind("<KeyRelease>", response)
         master.bind_child(self)

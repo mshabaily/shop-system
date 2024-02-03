@@ -1,6 +1,11 @@
 from tkinter import Tk, font, messagebox
-from data import EmployeeData, storeData
+from data import passwords, storeData
 from settings import bodyFont
+
+def updatePassword():
+    for passwordData in passwords:
+        if passwordData.employeeId == window.user.employeeId:
+            passwordData.password = window.user.password
 
 def saveFiles():
     for data in storeData:
@@ -20,7 +25,8 @@ def closeGUI():
     window.destroy()
 
 class User:
-    def __init__(self, name, password, status):
+    def __init__(self, employeeId, name, password, status):
+        self.employeeId = employeeId
         self.name = name
         self.password = password
         self.status = status
@@ -32,7 +38,7 @@ class GUI(Tk):
         self.defaultFont = font.nametofont("TkTextFont")
         self.defaultFont.configure(family= bodyFont[0], size= bodyFont[1], weight=font.NORMAL)
         self.protocol("WM_DELETE_WINDOW", closeGUI)
-        self.minsize(width = 1000, height = 700)
+        self.minsize(width = 500, height = 300)
     def clear(self):
         for child in self.winfo_children():
             child.destroy()
