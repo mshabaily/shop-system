@@ -4,7 +4,6 @@ passwords = []
 rota = []
 
 storeData = [stock, employees, passwords, rota]
-accessMap : {str : str} = {}
 
 class StockData:
     def __init__(self,fields):
@@ -28,7 +27,6 @@ class EmployeeData:
         self.status = fields[3]
         self.timeWorked = fields[4]
         self.timeMissed = fields[5]
-        accessMap.update({self.name : self.status})
     def forget(self):
         employees.remove(self)
     def getPath(self):
